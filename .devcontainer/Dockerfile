@@ -156,6 +156,12 @@ LABEL maintainer="TrustWork" \
 USER vscode
 
 # ─────────────────────────────────────────────────────────────────
+# 12. Health check
+# ─────────────────────────────────────────────────────────────────
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD solana --version && anchor --version && node --version || exit 1
+
+# ─────────────────────────────────────────────────────────────────
 # 9. tini como init — previene procesos zombie
 # ─────────────────────────────────────────────────────────────────
 ENTRYPOINT ["/usr/bin/tini", "--"]
