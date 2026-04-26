@@ -11,7 +11,7 @@ use anchor_client::{
 use anyhow::Result;
 use std::rc::Rc;
 
-pub const PROGRAM_ID: &str = "46gJKBXChEaV3K4juvfcmAvNEXpCPd51yCDK6Cf4HoeX";
+pub const PROGRAM_ID: &str = "5pXEX8z1aTSnm7jCKqvJCXezczKPVuPQif2BZh5u5Axq";
 
 #[derive(Debug, thiserror::Error)]
 pub enum SdkError {
