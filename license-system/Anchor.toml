@@ -6,16 +6,16 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-license_system = "46gJKBXChEaV3K4juvfcmAvNEXpCPd51yCDK6Cf4HoeX"
+license_system = "5pXEX8z1aTSnm7jCKqvJCXezczKPVuPQif2BZh5u5Axq"
 
 [programs.devnet]
-license_system = "46gJKBXChEaV3K4juvfcmAvNEXpCPd51yCDK6Cf4HoeX"
+license_system = "5pXEX8z1aTSnm7jCKqvJCXezczKPVuPQif2BZh5u5Axq"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "devnet"
+cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
