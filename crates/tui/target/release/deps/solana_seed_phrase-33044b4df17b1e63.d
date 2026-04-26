@@ -1,0 +1,7 @@
+/home/dcdebian/Proyects/License-System-on-Solana/crates/tui/target/release/deps/solana_seed_phrase-33044b4df17b1e63.d: /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-seed-phrase-2.2.1/src/lib.rs
+
+/home/dcdebian/Proyects/License-System-on-Solana/crates/tui/target/release/deps/libsolana_seed_phrase-33044b4df17b1e63.rlib: /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-seed-phrase-2.2.1/src/lib.rs
+
+/home/dcdebian/Proyects/License-System-on-Solana/crates/tui/target/release/deps/libsolana_seed_phrase-33044b4df17b1e63.rmeta: /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-seed-phrase-2.2.1/src/lib.rs
+
+/home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-seed-phrase-2.2.1/src/lib.rs:

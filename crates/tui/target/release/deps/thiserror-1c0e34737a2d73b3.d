@@ -1,0 +1,14 @@
+/home/dcdebian/Proyects/License-System-on-Solana/crates/tui/target/release/deps/thiserror-1c0e34737a2d73b3.d: /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/lib.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/aserror.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/display.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/var.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/private.rs /home/dcdebian/Proyects/License-System-on-Solana/crates/tui/target/release/build/thiserror-a18d78997a88cfb7/out/private.rs
+
+/home/dcdebian/Proyects/License-System-on-Solana/crates/tui/target/release/deps/libthiserror-1c0e34737a2d73b3.rlib: /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/lib.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/aserror.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/display.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/var.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/private.rs /home/dcdebian/Proyects/License-System-on-Solana/crates/tui/target/release/build/thiserror-a18d78997a88cfb7/out/private.rs
+
+/home/dcdebian/Proyects/License-System-on-Solana/crates/tui/target/release/deps/libthiserror-1c0e34737a2d73b3.rmeta: /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/lib.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/aserror.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/display.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/var.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/private.rs /home/dcdebian/Proyects/License-System-on-Solana/crates/tui/target/release/build/thiserror-a18d78997a88cfb7/out/private.rs
+
+/home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/lib.rs:
+/home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/aserror.rs:
+/home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/display.rs:
+/home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/var.rs:
+/home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/private.rs:
+/home/dcdebian/Proyects/License-System-on-Solana/crates/tui/target/release/build/thiserror-a18d78997a88cfb7/out/private.rs:
+
+# env-dep:OUT_DIR=/home/dcdebian/Proyects/License-System-on-Solana/crates/tui/target/release/build/thiserror-a18d78997a88cfb7/out

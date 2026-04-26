@@ -1,0 +1,14 @@
+/home/dcdebian/Proyects/License-System-on-Solana/crates/tui/target/release/deps/serde-ed3a948fa2574d20.d: /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/dcdebian/Proyects/License-System-on-Solana/crates/tui/target/release/build/serde-457a88a0032959fa/out/private.rs
+
+/home/dcdebian/Proyects/License-System-on-Solana/crates/tui/target/release/deps/libserde-ed3a948fa2574d20.rlib: /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/dcdebian/Proyects/License-System-on-Solana/crates/tui/target/release/build/serde-457a88a0032959fa/out/private.rs
+
+/home/dcdebian/Proyects/License-System-on-Solana/crates/tui/target/release/deps/libserde-ed3a948fa2574d20.rmeta: /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/dcdebian/Proyects/License-System-on-Solana/crates/tui/target/release/build/serde-457a88a0032959fa/out/private.rs
+
+/home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs:
+/home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs:
+/home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs:
+/home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs:
+/home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs:
+/home/dcdebian/Proyects/License-System-on-Solana/crates/tui/target/release/build/serde-457a88a0032959fa/out/private.rs:
+
+# env-dep:OUT_DIR=/home/dcdebian/Proyects/License-System-on-Solana/crates/tui/target/release/build/serde-457a88a0032959fa/out
