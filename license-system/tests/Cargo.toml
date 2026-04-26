@@ -7,4 +7,6 @@ rust-version = "1.89.0"
 
 [dependencies]
 anchor-client = "0.32.1"
+anchor-lang = "0.32.1"
 license-system = { version = "0.1.0", path = "../programs/license-system" }
+# mollusk-svm = "0.20"  # Commented out - not needed for basic tests

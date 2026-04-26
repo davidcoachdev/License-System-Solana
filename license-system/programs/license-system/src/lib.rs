@@ -34,7 +34,7 @@ pub mod license_system {
 
         let now = Clock::get()?.unix_timestamp;
         let grace_period = 7 * 24 * 60 * 60;
-        if license.expires_at < now - grace_period {
+        if license.expires_at < now + grace_period {
             return Err(ErrorCode::LicenseExpired.into());
         }
 
@@ -60,7 +60,7 @@ pub mod license_system {
     pub fn validate_license(
         ctx: Context<ValidateLicense>,
         product_id: String,
-    ) -> Result<ValidationResult> {
+    ) -> Result<bool> {
         let license = &ctx.accounts.license;
         let now = Clock::get()?.unix_timestamp;
 
@@ -74,7 +74,7 @@ pub mod license_system {
             msg!("License INVALID");
         }
 
-        Ok(ValidationResult { is_valid })
+        Ok(is_valid)
     }
 }
 
@@ -95,7 +95,8 @@ pub struct IssueLicense<'info> {
         payer = authority,
         space = 8 + License::INIT_SPACE,
         seeds = [b"license", owner.key().as_ref()],
-        bump
+        bump,
+        constraint = owner.key() == authority.key() @ ErrorCode::Unauthorized
     )]
     pub license: Account<'info, License>,
     #[account(mut)]
@@ -109,9 +110,11 @@ pub struct ExtendLicense<'info> {
     #[account(
         mut,
         seeds = [b"license", license.owner.as_ref()],
-        bump
+        bump,
+        constraint = authority.key() == license.owner @ ErrorCode::Unauthorized
     )]
     pub license: Account<'info, License>,
+    #[account(signer)]
     pub authority: Signer<'info>,
 }
 
@@ -120,9 +123,11 @@ pub struct RevokeLicense<'info> {
     #[account(
         mut,
         seeds = [b"license", license.owner.as_ref()],
-        bump
+        bump,
+        constraint = authority.key() == license.owner @ ErrorCode::Unauthorized
     )]
     pub license: Account<'info, License>,
+    #[account(signer)]
     pub authority: Signer<'info>,
 }
 
@@ -146,4 +151,7 @@ pub enum ErrorCode {
 
     #[msg("License has expired and cannot be extended")]
     LicenseExpired,
+
+    #[msg("Unauthorized to perform this action")]
+    Unauthorized,
 }
