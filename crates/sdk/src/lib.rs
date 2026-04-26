@@ -67,6 +67,10 @@ impl LicenseClient {
     pub fn payer_pubkey(&self) -> Pubkey {
         self.payer.pubkey()
     }
+
+    pub fn program_id(&self) -> Pubkey {
+        self.program_id
+    }
 }
 
 #[derive(Debug, Clone)]

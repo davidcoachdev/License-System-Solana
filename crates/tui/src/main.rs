@@ -148,14 +148,29 @@ impl App {
                     }
                 };
                 
+                let product_id = parts[1].trim().to_string();
+                let days: i64 = match parts[2].trim().parse() {
+                    Ok(d) => d,
+                    Err(_) => {
+                        self.status_message = "Invalid days number".to_string();
+                        return;
+                    }
+                };
+
                 let (license_pda, bump) = client.derive_license_pda(&owner);
                 self.status_message = format!(
-                    "License PDA: {} (bump: {})\nPayer: {}\nReady to issue for owner: {}",
-                    license_pda, bump, client.payer_pubkey(), owner
+                    "✅ Ready to issue license!\nPDA: {}\nBump: {}\nOwner: {}\nProduct: {}\nDays: {}\nPayer: {}\n\n[Demo mode - use TypeScript tests for real transactions]",
+                    license_pda, bump, owner, product_id, days, client.payer_pubkey()
                 );
             }
             Screen::ExtendLicense => {
-                let owner = match Pubkey::from_str(self.input.trim()) {
+                let parts: Vec<&str> = self.input.split(',').collect();
+                if parts.len() != 2 {
+                    self.status_message = "Format: owner_pubkey,additional_days".to_string();
+                    return;
+                }
+                
+                let owner = match Pubkey::from_str(parts[0].trim()) {
                     Ok(pk) => pk,
                     Err(_) => {
                         self.status_message = "Invalid owner pubkey".to_string();
@@ -163,14 +178,28 @@ impl App {
                     }
                 };
                 
+                let days: i64 = match parts[1].trim().parse() {
+                    Ok(d) => d,
+                    Err(_) => {
+                        self.status_message = "Invalid days number".to_string();
+                        return;
+                    }
+                };
+
                 let (license_pda, bump) = client.derive_license_pda(&owner);
                 self.status_message = format!(
-                    "License PDA: {} (bump: {})\nReady to extend",
-                    license_pda, bump
+                    "✅ Ready to extend license!\nPDA: {}\nBump: {}\nAdditional days: {}\n\n[Demo mode - use TypeScript tests for real transactions]",
+                    license_pda, bump, days
                 );
             }
             Screen::ValidateLicense => {
-                let owner = match Pubkey::from_str(self.input.trim()) {
+                let parts: Vec<&str> = self.input.split(',').collect();
+                if parts.len() != 2 {
+                    self.status_message = "Format: owner_pubkey,product_id".to_string();
+                    return;
+                }
+                
+                let owner = match Pubkey::from_str(parts[0].trim()) {
                     Ok(pk) => pk,
                     Err(_) => {
                         self.status_message = "Invalid owner pubkey".to_string();
@@ -178,10 +207,11 @@ impl App {
                     }
                 };
                 
+                let product_id = parts[1].trim();
                 let (license_pda, bump) = client.derive_license_pda(&owner);
                 self.status_message = format!(
-                    "License PDA: {} (bump: {})\nReady to validate",
-                    license_pda, bump
+                    "✅ Ready to validate license!\nPDA: {}\nBump: {}\nProduct: {}\n\n[Demo mode - use TypeScript tests for real validation]",
+                    license_pda, bump, product_id
                 );
             }
             Screen::RevokeLicense => {
@@ -192,10 +222,10 @@ impl App {
                         return;
                     }
                 };
-                
+
                 let (license_pda, bump) = client.derive_license_pda(&owner);
                 self.status_message = format!(
-                    "License PDA: {} (bump: {})\nReady to revoke",
+                    "✅ Ready to revoke license!\nPDA: {}\nBump: {}\n\n[Demo mode - use TypeScript tests for real transactions]",
                     license_pda, bump
                 );
             }
@@ -210,8 +240,8 @@ impl App {
                 
                 let (license_pda, bump) = client.derive_license_pda(&owner);
                 self.status_message = format!(
-                    "License PDA: {}\nBump: {}\nOwner: {}\nPayer: {}",
-                    license_pda, bump, owner, client.payer_pubkey()
+                    "📋 License Info:\nPDA: {}\nBump: {}\nOwner: {}\nPayer: {}\nProgram ID: {}\n\n[Demo mode - showing PDA derivation only]",
+                    license_pda, bump, owner, client.payer_pubkey(), client.program_id()
                 );
             }
             Screen::Main => {
