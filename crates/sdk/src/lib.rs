@@ -13,6 +13,9 @@ use std::rc::Rc;
 
 pub const PROGRAM_ID: &str = "5pXEX8z1aTSnm7jCKqvJCXezczKPVuPQif2BZh5u5Axq";
 
+#[cfg(test)]
+mod tests;
+
 #[derive(Debug, thiserror::Error)]
 pub enum SdkError {
     #[error("RPC connection failed: {0}")]
