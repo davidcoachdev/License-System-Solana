@@ -1902,6 +1902,7 @@ name = "license-system"
 version = "0.1.0"
 dependencies = [
  "anchor-lang",
+ "getrandom 0.1.16",
 ]
 
 [[package]]
