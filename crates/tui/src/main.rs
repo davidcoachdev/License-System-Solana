@@ -13,6 +13,9 @@ use ratatui::{
     Frame, Terminal,
 };
 use std::io;
+use license_sdk::{LicenseClient, License};
+use solana_sdk::{pubkey::Pubkey, signature::Keypair};
+use std::str::FromStr;
 
 #[derive(Debug, Clone)]
 enum Screen {
@@ -28,6 +31,7 @@ struct App {
     selected: usize,
     input: String,
     status_message: String,
+    sdk_client: Option<LicenseClient>,
 }
 
 impl App {
@@ -36,8 +40,19 @@ impl App {
             screen: Screen::Main,
             selected: 0,
             input: String::new(),
-            status_message: String::from("Welcome to License System TUI"),
+            status_message: String::from("Welcome to License System TUI - Connecting to Solana..."),
+            sdk_client: None,
         }
+    }
+
+    fn init_sdk(&mut self, keypair_path: &str) -> Result<()> {
+        let keypair = solana_sdk::signature::read_keypair_file(keypair_path)
+            .map_err(|e| anyhow::anyhow!("Failed to load keypair: {}", e))?;
+        
+        let client = LicenseClient::new_localnet(keypair)?;
+        self.sdk_client = Some(client);
+        self.status_message = "Connected to Solana localnet".to_string();
+        Ok(())
     }
 
     fn menu_items(&self) -> Vec<&str> {
@@ -104,21 +119,85 @@ impl App {
     }
 
     fn execute_action(&mut self) {
+        if self.sdk_client.is_none() {
+            self.status_message = "Error: SDK not initialized".to_string();
+            return;
+        }
+
+        let client = self.sdk_client.as_ref().unwrap();
+
         match self.screen {
             Screen::IssueLicense => {
-                self.status_message = format!("Issuing license for: {}", self.input);
+                let parts: Vec<&str> = self.input.split(',').collect();
+                if parts.len() != 3 {
+                    self.status_message = "Format: owner_pubkey,product_id,days".to_string();
+                    return;
+                }
+                
+                let owner = match Pubkey::from_str(parts[0].trim()) {
+                    Ok(pk) => pk,
+                    Err(_) => {
+                        self.status_message = "Invalid owner pubkey".to_string();
+                        return;
+                    }
+                };
+                
+                let (license_pda, bump) = client.derive_license_pda(&owner);
+                self.status_message = format!(
+                    "License PDA: {} (bump: {})\nPayer: {}\nReady to issue for owner: {}",
+                    license_pda, bump, client.payer_pubkey(), owner
+                );
             }
             Screen::ExtendLicense => {
-                self.status_message = format!("Extending license: {}", self.input);
+                let owner = match Pubkey::from_str(self.input.trim()) {
+                    Ok(pk) => pk,
+                    Err(_) => {
+                        self.status_message = "Invalid owner pubkey".to_string();
+                        return;
+                    }
+                };
+                
+                let (license_pda, bump) = client.derive_license_pda(&owner);
+                self.status_message = format!(
+                    "License PDA: {} (bump: {})\nReady to extend",
+                    license_pda, bump
+                );
             }
             Screen::ValidateLicense => {
-                self.status_message = format!("Validating license: {}", self.input);
+                let owner = match Pubkey::from_str(self.input.trim()) {
+                    Ok(pk) => pk,
+                    Err(_) => {
+                        self.status_message = "Invalid owner pubkey".to_string();
+                        return;
+                    }
+                };
+                
+                let (license_pda, bump) = client.derive_license_pda(&owner);
+                self.status_message = format!(
+                    "License PDA: {} (bump: {})\nReady to validate",
+                    license_pda, bump
+                );
             }
             Screen::RevokeLicense => {
-                self.status_message = format!("Revoking license: {}", self.input);
+                let owner = match Pubkey::from_str(self.input.trim()) {
+                    Ok(pk) => pk,
+                    Err(_) => {
+                        self.status_message = "Invalid owner pubkey".to_string();
+                        return;
+                    }
+                };
+                
+                let (license_pda, bump) = client.derive_license_pda(&owner);
+                self.status_message = format!(
+                    "License PDA: {} (bump: {})\nReady to revoke",
+                    license_pda, bump
+                );
             }
-            Screen::Main => {}
+            Screen::Main => {
+                return;
+            }
         }
+        
         self.input.clear();
     }
 }
@@ -182,13 +261,22 @@ fn ui(f: &mut Frame, app: &App) {
 }
 
 fn main() -> Result<()> {
+    let mut app = App::new();
+    
+    let keypair_path = std::env::var("ANCHOR_WALLET")
+        .unwrap_or_else(|_| format!("{}/.config/solana/id.json", std::env::var("HOME").unwrap()));
+    
+    if let Err(e) = app.init_sdk(&keypair_path) {
+        eprintln!("Failed to initialize SDK: {}", e);
+        eprintln!("Make sure ANCHOR_WALLET is set or ~/.config/solana/id.json exists");
+        return Err(e);
+    }
+
     enable_raw_mode()?;
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen)?;
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
-
-    let mut app = App::new();
 
     loop {
         terminal.draw(|f| ui(f, &app))?;
