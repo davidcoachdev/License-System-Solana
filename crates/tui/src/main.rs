@@ -24,6 +24,7 @@ enum Screen {
     ExtendLicense,
     ValidateLicense,
     RevokeLicense,
+    ListLicenses,
 }
 
 struct App {
@@ -61,7 +62,8 @@ impl App {
             "2. Extend License",
             "3. Validate License",
             "4. Revoke License",
-            "5. Exit",
+            "5. List Licenses",
+            "6. Exit",
         ]
     }
 
@@ -70,21 +72,25 @@ impl App {
             Screen::Main => match key.code {
                 KeyCode::Char('1') => {
                     self.screen = Screen::IssueLicense;
-                    self.status_message = "Issue License - Enter owner pubkey".to_string();
+                    self.status_message = "Issue License - Enter: owner_pubkey,product_id,days".to_string();
                 }
                 KeyCode::Char('2') => {
                     self.screen = Screen::ExtendLicense;
-                    self.status_message = "Extend License - Enter license PDA".to_string();
+                    self.status_message = "Extend License - Enter: owner_pubkey,additional_days".to_string();
                 }
                 KeyCode::Char('3') => {
                     self.screen = Screen::ValidateLicense;
-                    self.status_message = "Validate License - Enter license PDA".to_string();
+                    self.status_message = "Validate License - Enter: owner_pubkey,product_id".to_string();
                 }
                 KeyCode::Char('4') => {
                     self.screen = Screen::RevokeLicense;
-                    self.status_message = "Revoke License - Enter license PDA".to_string();
+                    self.status_message = "Revoke License - Enter: owner_pubkey".to_string();
                 }
-                KeyCode::Char('5') | KeyCode::Char('q') => return true,
+                KeyCode::Char('5') => {
+                    self.screen = Screen::ListLicenses;
+                    self.status_message = "List Licenses - Enter: owner_pubkey".to_string();
+                }
+                KeyCode::Char('6') | KeyCode::Char('q') => return true,
                 KeyCode::Down => {
                     self.selected = (self.selected + 1) % self.menu_items().len();
                 }
@@ -191,6 +197,21 @@ impl App {
                 self.status_message = format!(
                     "License PDA: {} (bump: {})\nReady to revoke",
                     license_pda, bump
+                );
+            }
+            Screen::ListLicenses => {
+                let owner = match Pubkey::from_str(self.input.trim()) {
+                    Ok(pk) => pk,
+                    Err(_) => {
+                        self.status_message = "Invalid owner pubkey".to_string();
+                        return;
+                    }
+                };
+                
+                let (license_pda, bump) = client.derive_license_pda(&owner);
+                self.status_message = format!(
+                    "License PDA: {}\nBump: {}\nOwner: {}\nPayer: {}",
+                    license_pda, bump, owner, client.payer_pubkey()
                 );
             }
             Screen::Main => {
