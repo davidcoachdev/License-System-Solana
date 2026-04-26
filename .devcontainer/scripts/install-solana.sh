@@ -23,7 +23,13 @@ else
     echo "⚠️ Keypair ya existe, saltando..."
 fi
 
-echo "⚙️ Configurando URL a localhost..."
-solana config set --url localhost
+echo "⚙️ Configurando URL RPC..."
+if [ -n "${CODESPACES:-}" ]; then
+    echo "🌐 Detectado GitHub Codespaces, usando URL forwarded"
+    solana config set --url "https://${CODESPACE_NAME}-8899.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}"
+else
+    echo "🏠 Entorno local, usando localhost"
+    solana config set --url localhost
+fi
 
 echo "✅ Solana $(solana --version) instalado"
