@@ -1,0 +1,11 @@
+/home/dcdebian/Proyects/License-System-on-Solana/crates/sdk/target/debug/deps/ctr-0436313c9ddeb6da.d: /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctr-0.9.2/src/lib.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctr-0.9.2/src/flavors.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctr-0.9.2/src/flavors/ctr128.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctr-0.9.2/src/flavors/ctr32.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctr-0.9.2/src/flavors/ctr64.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctr-0.9.2/src/backend.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctr-0.9.2/src/ctr_core.rs
+
+/home/dcdebian/Proyects/License-System-on-Solana/crates/sdk/target/debug/deps/libctr-0436313c9ddeb6da.rmeta: /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctr-0.9.2/src/lib.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctr-0.9.2/src/flavors.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctr-0.9.2/src/flavors/ctr128.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctr-0.9.2/src/flavors/ctr32.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctr-0.9.2/src/flavors/ctr64.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctr-0.9.2/src/backend.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctr-0.9.2/src/ctr_core.rs
+
+/home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctr-0.9.2/src/lib.rs:
+/home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctr-0.9.2/src/flavors.rs:
+/home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctr-0.9.2/src/flavors/ctr128.rs:
+/home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctr-0.9.2/src/flavors/ctr32.rs:
+/home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctr-0.9.2/src/flavors/ctr64.rs:
+/home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctr-0.9.2/src/backend.rs:
+/home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctr-0.9.2/src/ctr_core.rs:
