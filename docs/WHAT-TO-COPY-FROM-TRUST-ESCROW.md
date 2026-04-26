@@ -1,7 +1,9 @@
-# 📋 Qué Copiar de Trust-Work-Escrow
+# 📋 Qué ADAPTAR de Trust-Work-Escrow
 
 **Basado en**: `/home/dcdebian/Proyects/Trust-Work-Escrow/`  
-**Objetivo**: Aplicar las mejores prácticas de trust-escrow a License System
+**Objetivo**: **ADAPTAR** (no copiar directo) las mejores prácticas de trust-escrow a License System
+
+⚠️ **IMPORTANTE**: NO copiar código directamente. Usar como **REFERENCIA** para implementar funcionalidad similar adaptada a nuestro dominio (licencias vs escrow).
 
 ---
 
