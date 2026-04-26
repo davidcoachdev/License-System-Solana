@@ -24,8 +24,14 @@ curl -sSL -o /tmp/surfpool.tar.gz "$TAR_URL"
 
 echo "Extracting surfpool..."
 cd /tmp
-gzip -d surfpool.tar.gz
-tar -xf surfpool.tar
+if ! gzip -d surfpool.tar.gz; then
+    echo "❌ Failed to decompress surfpool.tar.gz"
+    exit 1
+fi
+if ! tar -xf surfpool.tar; then
+    echo "❌ Failed to extract surfpool.tar"
+    exit 1
+fi
 
 echo "Installing surfpool to ${HOME}/.local/bin..."
 install -m 0755 surfpool "$HOME/.local/bin/surfpool"

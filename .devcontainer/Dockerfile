@@ -151,6 +151,11 @@ LABEL maintainer="TrustWork" \
     node.version="${NODE_VERSION}"
 
 # ─────────────────────────────────────────────────────────────────
+# 11. Switch to non-root user (security best practice)
+# ─────────────────────────────────────────────────────────────────
+USER vscode
+
+# ─────────────────────────────────────────────────────────────────
 # 9. tini como init — previene procesos zombie
 # ─────────────────────────────────────────────────────────────────
 ENTRYPOINT ["/usr/bin/tini", "--"]
