@@ -234,14 +234,14 @@ fn render_content(f: &mut Frame, app: &App, area: ratatui::layout::Rect) {
             let input_text = if app.input.is_empty() {
                 Line::from(vec![
                     Span::styled("  ▸ ", Style::default().fg(t.accent).add_modifier(Modifier::BOLD)),
+                    Span::styled("| ", Style::default().fg(t.accent).add_modifier(Modifier::SLOW_BLINK)),
                     Span::styled("Enter data here", Style::default().fg(t.muted)),
-                    Span::styled(" |", Style::default().fg(t.accent).add_modifier(Modifier::SLOW_BLINK)),
                 ])
             } else {
                 Line::from(vec![
                     Span::styled("  ▸ ", Style::default().fg(t.accent).add_modifier(Modifier::BOLD)),
+                    Span::styled("| ", Style::default().fg(t.accent).add_modifier(Modifier::SLOW_BLINK)),
                     Span::styled(&app.input, Style::default().fg(t.accent)),
-                    Span::styled(" |", Style::default().fg(t.accent).add_modifier(Modifier::SLOW_BLINK)),
                 ])
             };
 
