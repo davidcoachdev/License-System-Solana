@@ -48,15 +48,20 @@ impl App {
     }
 
     pub fn menu_items(&self) -> Vec<&str> {
-        vec![
-            "Issue License",
-            "Extend License",
-            "Validate License",
-            "Revoke License",
-            "List Licenses",
-            "Settings",
-            "Exit",
-        ]
+        match self.screen {
+            Screen::Settings => vec!["← Back", "Theme", "Network"],
+            Screen::SettingsTheme => vec!["← Back", "Dark", "Light", "Dracula", "Nord", "Gruvbox"],
+            Screen::SettingsNetwork => vec!["← Back", "Localnet", "Devnet", "Mainnet"],
+            _ => vec![
+                "Issue License",
+                "Extend License",
+                "Validate License",
+                "Revoke License",
+                "List Licenses",
+                "Settings",
+                "Exit",
+            ],
+        }
     }
 
     pub fn init_sdk(&mut self, keypair_path: &str) -> anyhow::Result<()> {

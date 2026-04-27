@@ -74,31 +74,31 @@ impl App {
             KeyCode::Enter => {
                 match self.selected {
                     0 => {
+                        self.screen = Screen::Main;
+                        self.selected = 0;
+                        self.status_message = "Returned to main menu".to_string();
+                    }
+                    1 => {
                         self.screen = Screen::SettingsTheme;
                         self.selected = 0;
                         self.status_message = "Select a theme".to_string();
                     }
-                    1 => {
+                    2 => {
                         self.screen = Screen::SettingsNetwork;
                         self.selected = 0;
                         self.status_message = "Select a network".to_string();
-                    }
-                    2 => {
-                        self.screen = Screen::Main;
-                        self.selected = 0;
-                        self.status_message = "Returned to main menu".to_string();
                     }
                     _ => {}
                 }
             }
             KeyCode::Down => {
-                self.selected = (self.selected + 1) % self.settings_items.len();
+                self.selected = (self.selected + 1) % 3;
             }
             KeyCode::Up => {
                 if self.selected > 0 {
                     self.selected -= 1;
                 } else {
-                    self.selected = self.settings_items.len() - 1;
+                    self.selected = 2;
                 }
             }
             _ => {}
@@ -114,24 +114,30 @@ impl App {
                 self.status_message = "Settings - Select an option".to_string();
             }
             KeyCode::Enter => {
-                let themes = Theme::names();
-                if self.selected < themes.len() {
-                    let theme_name = &themes[self.selected];
-                    self.theme = Theme::by_name(theme_name);
-                    self.status_message = format!("✅ Theme changed to: {}", theme_name);
+                if self.selected == 0 {
                     self.screen = Screen::Settings;
                     self.selected = 0;
+                    self.status_message = "Settings - Select an option".to_string();
+                } else {
+                    let themes = Theme::names();
+                    let theme_index = self.selected - 1;
+                    if theme_index < themes.len() {
+                        let theme_name = &themes[theme_index];
+                        self.theme = Theme::by_name(theme_name);
+                        self.status_message = format!("✅ Theme changed to: {}", theme_name);
+                        self.screen = Screen::Settings;
+                        self.selected = 0;
+                    }
                 }
             }
             KeyCode::Down => {
-                self.selected = (self.selected + 1) % Theme::names().len();
+                self.selected = (self.selected + 1) % 6;
             }
             KeyCode::Up => {
-                let len = Theme::names().len();
                 if self.selected > 0 {
                     self.selected -= 1;
                 } else {
-                    self.selected = len - 1;
+                    self.selected = 5;
                 }
             }
             _ => {}
@@ -147,22 +153,29 @@ impl App {
                 self.status_message = "Settings - Select an option".to_string();
             }
             KeyCode::Enter => {
-                let networks = vec!["localnet", "devnet", "mainnet"];
-                if self.selected < networks.len() {
-                    self.network = networks[self.selected].to_string();
-                    self.status_message = format!("✅ Network changed to: {}", self.network);
+                if self.selected == 0 {
                     self.screen = Screen::Settings;
                     self.selected = 0;
+                    self.status_message = "Settings - Select an option".to_string();
+                } else {
+                    let networks = vec!["localnet", "devnet", "mainnet"];
+                    let network_index = self.selected - 1;
+                    if network_index < networks.len() {
+                        self.network = networks[network_index].to_string();
+                        self.status_message = format!("✅ Network changed to: {}", self.network);
+                        self.screen = Screen::Settings;
+                        self.selected = 0;
+                    }
                 }
             }
             KeyCode::Down => {
-                self.selected = (self.selected + 1) % 3;
+                self.selected = (self.selected + 1) % 4;
             }
             KeyCode::Up => {
                 if self.selected > 0 {
                     self.selected -= 1;
                 } else {
-                    self.selected = 2;
+                    self.selected = 3;
                 }
             }
             _ => {}
