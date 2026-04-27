@@ -69,7 +69,7 @@ impl App {
     }
 
     pub fn theme_options(&self) -> Vec<&str> {
-        vec!["Dark", "Light", "Dracula", "Nord", "Gruvbox"]
+        vec!["Dc Studio", "Dark", "Light", "Dracula", "Nord", "Gruvbox"]
     }
 
     pub fn network_options(&self) -> Vec<&str> {

@@ -114,23 +114,24 @@ impl App {
                 self.status_message = "Settings - Select an option".to_string();
             }
             KeyCode::Enter => {
-                let themes = vec!["dark", "light", "dracula", "nord", "gruvbox"];
+                let themes = vec!["dcdev", "dark", "light", "dracula", "nord", "gruvbox"];
                 if self.selected < themes.len() {
                     let theme_name = themes[self.selected];
                     self.theme = Theme::by_name(theme_name);
-                    self.status_message = format!("✅ Theme changed to: {}", theme_name);
+                    let display_name = if theme_name == "dcdev" { "Dc Studio" } else { theme_name };
+                    self.status_message = format!("✅ Theme changed to: {}", display_name);
                     self.screen = Screen::Settings;
                     self.selected = 1;
                 }
             }
             KeyCode::Down => {
-                self.selected = (self.selected + 1) % 5;
+                self.selected = (self.selected + 1) % 6;
             }
             KeyCode::Up => {
                 if self.selected > 0 {
                     self.selected -= 1;
                 } else {
-                    self.selected = 4;
+                    self.selected = 5;
                 }
             }
             _ => {}

@@ -16,6 +16,22 @@ pub struct Theme {
 }
 
 impl Theme {
+    pub fn dcdev() -> Self {
+        Self {
+            name: "dcdev".into(),
+            bg: Color::Rgb(18, 8, 8),
+            fg: Color::Rgb(240, 210, 210),
+            accent: Color::Rgb(255, 60, 60),
+            highlight: Color::Rgb(120, 20, 20),
+            error: Color::Rgb(255, 30, 30),
+            success: Color::Rgb(180, 255, 100),
+            warning: Color::Rgb(255, 160, 40),
+            border: Color::Rgb(160, 30, 30),
+            title: Color::Rgb(255, 80, 80),
+            muted: Color::Rgb(140, 70, 70),
+        }
+    }
+
     pub fn dark() -> Self {
         Self {
             name: "dark".into(),
@@ -98,16 +114,18 @@ impl Theme {
 
     pub fn by_name(name: &str) -> Self {
         match name {
+            "dcdev" => Self::dcdev(),
+            "dark" => Self::dark(),
             "light" => Self::light(),
             "dracula" => Self::dracula(),
             "nord" => Self::nord(),
             "gruvbox" => Self::gruvbox(),
-            _ => Self::dark(),
+            _ => Self::dcdev(),
         }
     }
 
     pub fn names() -> Vec<String> {
-        vec!["dark", "light", "dracula", "nord", "gruvbox"]
+        vec!["dcdev", "dark", "light", "dracula", "nord", "gruvbox"]
             .into_iter()
             .map(String::from)
             .collect()
@@ -116,6 +134,6 @@ impl Theme {
 
 impl Default for Theme {
     fn default() -> Self {
-        Self::dark()
+        Self::dcdev()
     }
 }
