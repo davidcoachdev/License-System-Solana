@@ -3,32 +3,78 @@ use solana_sdk::pubkey::Pubkey;
 use std::str::FromStr;
 
 use crate::app::{App, Screen, Theme};
-use crate::ui::{ConfirmModal, NotificationModal};
+use crate::ui::{Modal, ModalType};
 
 impl App {
     pub fn handle_key(&mut self, key: KeyEvent) -> bool {
-        if let Some(_) = &self.notification_modal {
-            self.notification_modal = None;
-            self.status_message = "Ready".to_string();
-            return false;
-        }
-
-        if let Some(modal) = &mut self.confirm_modal {
-            match key.code {
-                KeyCode::Left | KeyCode::Right | KeyCode::Char('h') | KeyCode::Char('l') => {
-                    modal.toggle_selection();
+        if let Some(modal) = &mut self.modal {
+            match &modal.modal_type {
+                ModalType::Notification { .. } => {
+                    self.modal = None;
+                    self.status_message = "Ready".to_string();
+                    return false;
                 }
-                KeyCode::Enter => {
-                    let should_quit = modal.is_confirm_selected();
-                    self.confirm_modal = None;
-                    return should_quit;
+                ModalType::Confirm { .. } => {
+                    match key.code {
+                        KeyCode::Left | KeyCode::Right => {
+                            modal.toggle_confirm_selection();
+                        }
+                        KeyCode::Enter => {
+                            let should_quit = modal.is_confirm_selected();
+                            self.modal = None;
+                            return should_quit;
+                        }
+                        KeyCode::Esc => {
+                            self.modal = None;
+                        }
+                        _ => {}
+                    }
+                    return false;
                 }
-                KeyCode::Esc | KeyCode::Char('n') => {
-                    self.confirm_modal = None;
+                ModalType::Password { .. } => {
+                    match key.code {
+                        KeyCode::Char(c) => {
+                            modal.push_password_char(c);
+                        }
+                        KeyCode::Backspace => {
+                            modal.pop_password_char();
+                        }
+                        KeyCode::Enter => {
+                            let password = modal.get_password().unwrap_or_default();
+                            self.modal = None;
+                            
+                            if password == "dc-ok" {
+                                if let Some(network) = self.pending_network.take() {
+                                    self.network = network.clone();
+                                    self.status_message = format!("✅ Network changed to: {}", network);
+                                    self.modal = Some(Modal::success(
+                                        "Network Changed",
+                                        &format!("Successfully switched to {}", network)
+                                    ));
+                                }
+                                self.screen = Screen::Settings;
+                                self.selected = 2;
+                            } else {
+                                self.modal = Some(Modal::error(
+                                    "Invalid Password",
+                                    "Incorrect password.\n\nMainnet access denied."
+                                ));
+                                self.pending_network = None;
+                            }
+                        }
+                        KeyCode::Esc => {
+                            self.modal = None;
+                            self.pending_network = None;
+                            self.status_message = "Network change cancelled".to_string();
+                        }
+                        _ => {}
+                    }
+                    return false;
                 }
-                _ => {}
+                ModalType::Progress { .. } => {
+                    return false;
+                }
             }
-            return false;
         }
 
         if key.code == KeyCode::F(1) || key.code == KeyCode::Char('?') {
@@ -53,7 +99,7 @@ impl App {
     fn handle_main_menu(&mut self, key: KeyEvent) -> bool {
         match key.code {
             KeyCode::Char('q') => {
-                self.confirm_modal = Some(ConfirmModal::new(
+                self.modal = Some(Modal::confirm(
                     "⚠️  Confirm Exit",
                     "Are you sure you want to exit?\n\nUse ←→ to select, Enter to confirm"
                 ));
@@ -92,7 +138,7 @@ impl App {
                         self.selected = 0;
                     }
                     6 => {
-                        self.confirm_modal = Some(ConfirmModal::new(
+                        self.modal = Some(Modal::confirm(
                             "⚠️  Confirm Exit",
                             "Are you sure you want to exit?\n\nUse ←→ to select, Enter to confirm"
                         ));
@@ -200,10 +246,22 @@ impl App {
             KeyCode::Enter => {
                 let networks = vec!["localnet", "devnet", "mainnet"];
                 if self.selected < networks.len() {
-                    self.network = networks[self.selected].to_string();
-                    self.status_message = format!("✅ Network changed to: {}", self.network);
-                    self.screen = Screen::Settings;
-                    self.selected = 2;
+                    let new_network = networks[self.selected].to_string();
+                    
+                    if new_network == "mainnet" {
+                        self.pending_network = Some(new_network);
+                        self.modal = Some(Modal::password(
+                            "🔐 Mainnet Password Required",
+                            "Enter password to switch to mainnet"
+                        ));
+                    } else {
+                        self.pending_network = Some(new_network.clone());
+                        self.modal = Some(Modal::progress(
+                            "🌐 Switching Network",
+                            &format!("Connecting to {}...", new_network),
+                            0
+                        ));
+                    }
                 }
             }
             KeyCode::Down => {
@@ -278,7 +336,7 @@ impl App {
     pub fn execute_action(&mut self) {
         if self.sdk_client.is_none() {
             self.status_message = "❌ SDK not initialized".to_string();
-            self.notification_modal = Some(NotificationModal::error(
+            self.modal = Some(Modal::error(
                 "SDK Error",
                 "SDK not initialized.\n\nMake sure ANCHOR_WALLET is set."
             ));
@@ -288,7 +346,7 @@ impl App {
         for field in &self.form_fields {
             if field.required && field.value.trim().is_empty() {
                 self.status_message = format!("❌ '{}' is required", field.label);
-                self.notification_modal = Some(NotificationModal::error(
+                self.modal = Some(Modal::error(
                     "Validation Error",
                     &format!("Field '{}' is required.\n\nPlease fill all required fields.", field.label)
                 ));
@@ -313,7 +371,7 @@ impl App {
                     Ok(pk) => pk,
                     Err(_) => {
                         self.status_message = "❌ Invalid owner pubkey".to_string();
-                        self.notification_modal = Some(NotificationModal::error(
+                        self.modal = Some(Modal::error(
                             "Invalid Pubkey",
                             "The owner pubkey is invalid.\n\nMake sure it's a valid Solana pubkey (43-44 characters).\n\nExample:\n3whY1ohdAV3uRXSpyzsKtwLg84X9fTZ1pSdCS8Vvqt7c"
                         ));
@@ -341,7 +399,7 @@ impl App {
                 match client.op_issue_license(&owner.to_string(), &product_id, days) {
                     Ok(sig) => {
                         self.status_message = format!("✅ License issued! Signature: {}", sig);
-                        self.notification_modal = Some(NotificationModal::success(
+                        self.modal = Some(Modal::success(
                             "License Issued",
                             &format!("License created successfully!\n\nSignature:\n{}\n\nProduct: {}\nDuration: {} days", sig, product_id, days)
                         ));
@@ -350,7 +408,7 @@ impl App {
                     }
                     Err(e) => {
                         self.status_message = format!("❌ Error: {}", e);
-                        self.notification_modal = Some(NotificationModal::error(
+                        self.modal = Some(Modal::error(
                             "Transaction Failed",
                             &format!("Failed to issue license:\n\n{}", e)
                         ));
@@ -371,7 +429,7 @@ impl App {
                     Ok(pk) => pk,
                     Err(_) => {
                         self.status_message = "❌ Invalid owner pubkey".to_string();
-                        self.notification_modal = Some(NotificationModal::error(
+                        self.modal = Some(Modal::error(
                             "Invalid Pubkey",
                             "The owner pubkey is invalid.\n\nMake sure it's a valid Solana pubkey (43-44 characters).\n\nExample:\n3whY1ohdAV3uRXSpyzsKtwLg84X9fTZ1pSdCS8Vvqt7c"
                         ));
@@ -390,7 +448,7 @@ impl App {
                 match client.op_extend_license(&owner.to_string(), days) {
                     Ok(sig) => {
                         self.status_message = format!("✅ License extended! Signature: {}", sig);
-                        self.notification_modal = Some(NotificationModal::success(
+                        self.modal = Some(Modal::success(
                             "License Extended",
                             &format!("License extended successfully!\n\nSignature:\n{}\n\nAdditional days: {}", sig, days)
                         ));
@@ -399,7 +457,7 @@ impl App {
                     }
                     Err(e) => {
                         self.status_message = format!("❌ Error: {}", e);
-                        self.notification_modal = Some(NotificationModal::error(
+                        self.modal = Some(Modal::error(
                             "Transaction Failed",
                             &format!("Failed to extend license:\n\n{}", e)
                         ));
@@ -420,7 +478,7 @@ impl App {
                     Ok(pk) => pk,
                     Err(_) => {
                         self.status_message = "❌ Invalid owner pubkey".to_string();
-                        self.notification_modal = Some(NotificationModal::error(
+                        self.modal = Some(Modal::error(
                             "Invalid Pubkey",
                             "The owner pubkey is invalid.\n\nMake sure it's a valid Solana pubkey (43-44 characters).\n\nExample:\n3whY1ohdAV3uRXSpyzsKtwLg84X9fTZ1pSdCS8Vvqt7c"
                         ));
@@ -456,7 +514,7 @@ impl App {
                     Ok(pk) => pk,
                     Err(_) => {
                         self.status_message = "❌ Invalid owner pubkey".to_string();
-                        self.notification_modal = Some(NotificationModal::error(
+                        self.modal = Some(Modal::error(
                             "Invalid Pubkey",
                             "The owner pubkey is invalid.\n\nMake sure it's a valid Solana pubkey (43-44 characters).\n\nExample:\n3whY1ohdAV3uRXSpyzsKtwLg84X9fTZ1pSdCS8Vvqt7c"
                         ));
@@ -469,7 +527,7 @@ impl App {
                 match client.op_revoke_license(&owner.to_string()) {
                     Ok(sig) => {
                         self.status_message = format!("✅ License revoked! Signature: {}", sig);
-                        self.notification_modal = Some(NotificationModal::success(
+                        self.modal = Some(Modal::success(
                             "License Revoked",
                             &format!("License revoked successfully!\n\nSignature:\n{}\n\n⚠️  This action is permanent!", sig)
                         ));
@@ -478,7 +536,7 @@ impl App {
                     }
                     Err(e) => {
                         self.status_message = format!("❌ Error: {}", e);
-                        self.notification_modal = Some(NotificationModal::error(
+                        self.modal = Some(Modal::error(
                             "Transaction Failed",
                             &format!("Failed to revoke license:\n\n{}", e)
                         ));
@@ -498,7 +556,7 @@ impl App {
                     Ok(pk) => pk,
                     Err(_) => {
                         self.status_message = "❌ Invalid owner pubkey".to_string();
-                        self.notification_modal = Some(NotificationModal::error(
+                        self.modal = Some(Modal::error(
                             "Invalid Pubkey",
                             "The owner pubkey is invalid.\n\nMake sure it's a valid Solana pubkey (43-44 characters).\n\nExample:\n3whY1ohdAV3uRXSpyzsKtwLg84X9fTZ1pSdCS8Vvqt7c"
                         ));
@@ -513,7 +571,7 @@ impl App {
                         use license_sdk::pda::derive_license_pda;
                         let (pda, bump) = derive_license_pda(&owner);
                         self.status_message = format!("✅ License found!");
-                        self.notification_modal = Some(NotificationModal::info(
+                        self.modal = Some(Modal::info(
                             "License Details",
                             &format!(
                                 "PDA: {}\nBump: {}\n\nOwner: {}\nProduct: {}\nExpires: {}\nRevoked: {}",
@@ -525,7 +583,7 @@ impl App {
                     }
                     Err(e) => {
                         self.status_message = format!("❌ Error: {}", e);
-                        self.notification_modal = Some(NotificationModal::error(
+                        self.modal = Some(Modal::error(
                             "License Not Found",
                             &format!("Failed to fetch license:\n\n{}", e)
                         ));

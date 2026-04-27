@@ -45,12 +45,8 @@ pub fn render(f: &mut Frame, app: &App) {
         render_help_popup(f, app);
     }
 
-    if let Some(modal) = &app.confirm_modal {
+    if let Some(modal) = &app.modal {
         modal.render(f, &app.theme);
-    }
-
-    if let Some(notification) = &app.notification_modal {
-        notification.render(f, &app.theme);
     }
 }
 

@@ -1,6 +1,6 @@
 use license_sdk::LicenseClient;
 use crate::app::{Theme, FormField};
-use crate::ui::{ConfirmModal, NotificationModal};
+use crate::ui::Modal;
 
 #[derive(Debug, Clone)]
 pub enum Screen {
@@ -27,8 +27,8 @@ pub struct App {
     pub network: String,
     pub settings_items: Vec<String>,
     pub show_help_popup: bool,
-    pub confirm_modal: Option<ConfirmModal>,
-    pub notification_modal: Option<NotificationModal>,
+    pub modal: Option<Modal>,
+    pub pending_network: Option<String>,
 }
 
 impl App {
@@ -49,8 +49,8 @@ impl App {
                 "Back".to_string(),
             ],
             show_help_popup: false,
-            confirm_modal: None,
-            notification_modal: None,
+            modal: None,
+            pending_network: None,
         }
     }
 

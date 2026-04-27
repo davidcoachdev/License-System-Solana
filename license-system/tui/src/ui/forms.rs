@@ -40,9 +40,9 @@ pub fn render_form(f: &mut Frame, app: &App, area: Rect) {
             format!("{}  {}", bar, field.placeholder)
         } else {
             if field.masked {
-                format!("{}  {} |", bar, "*".repeat(field.value.len()))
+                format!("{}  {}", bar, "*".repeat(field.value.len()))
             } else {
-                format!("{}  {} |", bar, field.value)
+                format!("{}  {}", bar, field.value)
             }
         };
         
