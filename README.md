@@ -11,7 +11,7 @@ Sistema de gestión de licencias descentralizado en Solana con TUI profesional, 
 
 ## 📖 Table of Contents
 
-- [🧾 License System on Solana](#-license-system-on-solana)
+- [🧾 License System Solana](#-license-system-solana)
   - [📖 Table of Contents](#-table-of-contents)
   - [🎯 About This Project](#-about-this-project)
   - [✨ Features](#-features)
