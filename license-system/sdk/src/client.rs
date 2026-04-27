@@ -173,17 +173,26 @@ impl LicenseClient {
     }
 
     pub fn get_all_licenses(&self) -> Result<Vec<License>> {
+        self.get_all_licenses_with_limit(None)
+    }
+
+    pub fn get_all_licenses_with_limit(&self, limit: Option<usize>) -> Result<Vec<License>> {
         let pid = program_id()?;
         let accounts = self.rpc.get_program_accounts(&pid)?;
         
         let mut licenses = Vec::new();
-        for (_pubkey, account) in accounts {
+        let max_count = limit.unwrap_or(usize::MAX);
+        
+        for (_pubkey, account) in accounts.into_iter().take(max_count) {
             if account.data.len() < 8 {
                 continue;
             }
             
             if let Ok(license) = self.deserialize_license(&account.data) {
                 licenses.push(license);
+                if licenses.len() >= max_count {
+                    break;
+                }
             }
         }
         
