@@ -276,13 +276,21 @@ impl App {
 
     pub fn execute_action(&mut self) {
         if self.sdk_client.is_none() {
-            self.status_message = "Error: SDK not initialized".to_string();
+            self.status_message = "❌ SDK not initialized".to_string();
+            self.notification_modal = Some(NotificationModal::error(
+                "SDK Error",
+                "SDK not initialized.\n\nMake sure ANCHOR_WALLET is set."
+            ));
             return;
         }
 
         for field in &self.form_fields {
             if field.required && field.value.trim().is_empty() {
                 self.status_message = format!("❌ '{}' is required", field.label);
+                self.notification_modal = Some(NotificationModal::error(
+                    "Validation Error",
+                    &format!("Field '{}' is required.\n\nPlease fill all required fields.", field.label)
+                ));
                 return;
             }
         }
