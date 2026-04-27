@@ -143,14 +143,22 @@ impl App {
                     4 => {
                         self.screen = Screen::ListLicenses;
                         self.setup_form_for_screen();
-                        self.status_message = "List Licenses - Fill the form".to_string();
+                        self.status_message = "List License - Fill the form".to_string();
                     }
                     5 => {
+                        self.screen = Screen::ViewAllLicenses;
+                        self.status_message = "View All Licenses".to_string();
+                    }
+                    6 => {
+                        self.screen = Screen::ViewRevokedHistory;
+                        self.status_message = "Revoked History".to_string();
+                    }
+                    7 => {
                         self.screen = Screen::Settings;
                         self.status_message = "Settings - Select an option".to_string();
                         self.selected = 0;
                     }
-                    6 => {
+                    8 => {
                         self.modal = Some(Modal::confirm(
                             "⚠️  Confirm Exit",
                             "Are you sure you want to exit?\n\nUse ←→ to select, Enter to confirm"
