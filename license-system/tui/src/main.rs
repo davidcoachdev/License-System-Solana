@@ -13,9 +13,12 @@ use ratatui::{
     Frame, Terminal,
 };
 use std::io;
-use license_sdk::{LicenseClient, License};
-use solana_sdk::{pubkey::Pubkey, signature::Keypair};
+use license_sdk::LicenseClient;
+use solana_sdk::pubkey::Pubkey;
 use std::str::FromStr;
+
+mod app;
+use app::{Theme, FormField};
 
 #[derive(Debug, Clone)]
 enum Screen {
@@ -33,6 +36,9 @@ struct App {
     input: String,
     status_message: String,
     sdk_client: Option<LicenseClient>,
+    theme: Theme,
+    form_fields: Vec<FormField>,
+    form_index: usize,
 }
 
 impl App {
@@ -43,6 +49,9 @@ impl App {
             input: String::new(),
             status_message: String::from("Welcome to License System TUI - Connecting to Solana..."),
             sdk_client: None,
+            theme: Theme::default(),
+            form_fields: Vec::new(),
+            form_index: 0,
         }
     }
 
@@ -285,6 +294,11 @@ impl App {
 }
 
 fn ui(f: &mut Frame, app: &App) {
+    let t = &app.theme;
+    
+    let full = f.area();
+    f.render_widget(Block::default().style(Style::default().bg(t.bg)), full);
+    
     let main_chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
@@ -294,9 +308,9 @@ fn ui(f: &mut Frame, app: &App) {
         ])
         .split(f.area());
 
-    let title = Paragraph::new("License System on Solana - TUI")
-        .style(Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD))
-        .block(Block::default().borders(Borders::ALL));
+    let title = Paragraph::new("🧾 License System on Solana - TUI")
+        .style(Style::default().fg(t.title).bg(t.bg).add_modifier(Modifier::BOLD))
+        .block(Block::default().borders(Borders::ALL).border_style(Style::default().fg(t.border)));
     f.render_widget(title, main_chunks[0]);
 
     let content_chunks = Layout::default()
@@ -314,19 +328,23 @@ fn ui(f: &mut Frame, app: &App) {
         .map(|(i, item)| {
             let style = if i == app.selected {
                 Style::default()
-                    .fg(Color::Yellow)
+                    .fg(t.accent)
+                    .bg(t.highlight)
                     .add_modifier(Modifier::BOLD)
             } else {
-                Style::default()
+                Style::default().fg(t.fg).bg(t.bg)
             };
-            ListItem::new(Line::from(Span::styled(*item, style)))
+            let prefix = if i == app.selected { "▸ " } else { "  " };
+            ListItem::new(Line::from(Span::styled(format!("{}{}", prefix, item), style)))
         })
         .collect();
 
     let list = List::new(items).block(
         Block::default()
             .borders(Borders::ALL)
-            .title("Menu - Use ↑↓ Enter"),
+            .border_style(Style::default().fg(t.border))
+            .title("Menu - Use ↑↓ Enter")
+            .title_style(Style::default().fg(t.title).add_modifier(Modifier::BOLD)),
     );
     f.render_widget(list, content_chunks[0]);
 
@@ -339,29 +357,47 @@ fn ui(f: &mut Frame, app: &App) {
                 Press ESC to return\n\
                 Press q to quit"
             )
-            .style(Style::default().fg(Color::Gray))
+            .style(Style::default().fg(t.muted).bg(t.bg))
             .block(
                 Block::default()
                     .borders(Borders::ALL)
-                    .title("Help"),
+                    .border_style(Style::default().fg(t.border))
+                    .title("Help")
+                    .title_style(Style::default().fg(t.title).add_modifier(Modifier::BOLD)),
             );
             f.render_widget(help, content_chunks[1]);
         }
         _ => {
             let input_block = Paragraph::new(app.input.as_str())
-                .style(Style::default().fg(Color::Yellow))
+                .style(Style::default().fg(t.accent).bg(t.bg))
                 .block(
                     Block::default()
                         .borders(Borders::ALL)
-                        .title(format!("{:?} - Press ESC to return", app.screen)),
+                        .border_style(Style::default().fg(t.border))
+                        .title(format!("{:?} - Press ESC to return", app.screen))
+                        .title_style(Style::default().fg(t.title).add_modifier(Modifier::BOLD)),
                 );
             f.render_widget(input_block, content_chunks[1]);
         }
     }
 
+    let status_style = if app.status_message.contains("✅") {
+        Style::default().fg(t.success).bg(t.bg)
+    } else if app.status_message.contains("❌") {
+        Style::default().fg(t.error).bg(t.bg)
+    } else {
+        Style::default().fg(t.fg).bg(t.bg)
+    };
+
     let status = Paragraph::new(app.status_message.as_str())
-        .style(Style::default().fg(Color::Green))
-        .block(Block::default().borders(Borders::ALL).title("Status"));
+        .style(status_style)
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(t.border))
+                .title("Status")
+                .title_style(Style::default().fg(t.title).add_modifier(Modifier::BOLD))
+        );
     f.render_widget(status, main_chunks[2]);
 }
 
