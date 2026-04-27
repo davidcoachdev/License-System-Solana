@@ -194,16 +194,70 @@ fn render_content(f: &mut Frame, app: &App, area: ratatui::layout::Rect) {
             f.render_widget(network_list, area);
         }
         _ => {
-            let input_block = Paragraph::new(app.input.as_str())
-                .style(Style::default().fg(t.accent).bg(t.bg))
+            let screen_title = match app.screen {
+                Screen::IssueLicense => "Issue License",
+                Screen::ExtendLicense => "Extend License",
+                Screen::ValidateLicense => "Validate License",
+                Screen::RevokeLicense => "Revoke License",
+                Screen::ListLicenses => "List License",
+                _ => "Input",
+            };
+
+            let help_text = match app.screen {
+                Screen::IssueLicense => "Format: owner_pubkey,product_id,days\nExample: 3whY1ohdAV3uRXSpyzsKtwLg84X9fTZ1pSdCS8Vvqt7c,premium-plan,30",
+                Screen::ExtendLicense => "Format: owner_pubkey,additional_days\nExample: 3whY1ohdAV3uRXSpyzsKtwLg84X9fTZ1pSdCS8Vvqt7c,15",
+                Screen::ValidateLicense => "Format: owner_pubkey,product_id\nExample: 3whY1ohdAV3uRXSpyzsKtwLg84X9fTZ1pSdCS8Vvqt7c,premium-plan",
+                Screen::RevokeLicense => "Format: owner_pubkey\nExample: 3whY1ohdAV3uRXSpyzsKtwLg84X9fTZ1pSdCS8Vvqt7c",
+                Screen::ListLicenses => "Format: owner_pubkey\nExample: 3whY1ohdAV3uRXSpyzsKtwLg84X9fTZ1pSdCS8Vvqt7c",
+                _ => "",
+            };
+
+            let chunks = Layout::default()
+                .direction(Direction::Vertical)
+                .constraints([
+                    Constraint::Length(5),
+                    Constraint::Min(0),
+                ])
+                .split(area);
+
+            let help_block = Paragraph::new(help_text)
+                .style(Style::default().fg(t.muted).bg(t.bg))
                 .block(
                     Block::default()
                         .borders(Borders::ALL)
                         .border_style(Style::default().fg(t.border))
-                        .title(format!("{:?} - Press ESC to return", app.screen))
+                        .title("Format")
                         .title_style(Style::default().fg(t.title).add_modifier(Modifier::BOLD)),
                 );
-            f.render_widget(input_block, area);
+            f.render_widget(help_block, chunks[0]);
+
+            let input_text = if app.input.is_empty() {
+                Line::from(vec![
+                    Span::styled("  ▸ ", Style::default().fg(t.accent).add_modifier(Modifier::BOLD)),
+                    Span::styled("Enter data here...", Style::default().fg(t.muted)),
+                ])
+            } else {
+                Line::from(vec![
+                    Span::styled("  ▸ ", Style::default().fg(t.accent).add_modifier(Modifier::BOLD)),
+                    Span::styled(&app.input, Style::default().fg(t.accent)),
+                ])
+            };
+
+            let input_block = Paragraph::new(vec![
+                Line::from(""),
+                input_text,
+                Line::from(""),
+                Line::from(Span::styled("  Press Enter to submit", Style::default().fg(t.muted))),
+            ])
+            .style(Style::default().bg(t.bg))
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_style(Style::default().fg(t.border))
+                    .title(format!("{} - Press ESC to return", screen_title))
+                    .title_style(Style::default().fg(t.title).add_modifier(Modifier::BOLD)),
+            );
+            f.render_widget(input_block, chunks[1]);
         }
     }
 }
