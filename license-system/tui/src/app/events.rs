@@ -3,10 +3,15 @@ use solana_sdk::pubkey::Pubkey;
 use std::str::FromStr;
 
 use crate::app::{App, Screen, Theme};
-use crate::ui::ConfirmModal;
+use crate::ui::{ConfirmModal, NotificationModal};
 
 impl App {
     pub fn handle_key(&mut self, key: KeyEvent) -> bool {
+        if let Some(_) = &self.notification_modal {
+            self.notification_modal = None;
+            return false;
+        }
+
         if let Some(modal) = &mut self.confirm_modal {
             match key.code {
                 KeyCode::Left | KeyCode::Right | KeyCode::Char('h') | KeyCode::Char('l') => {
@@ -322,11 +327,21 @@ impl App {
                 
                 match client.op_issue_license(&owner.to_string(), &product_id, days) {
                     Ok(sig) => {
-                        self.status_message = format!("✅ License issued!\nSignature: {}", sig);
+                        self.status_message = format!("✅ License issued! Signature: {}", sig);
+                        self.notification_modal = Some(NotificationModal::success(
+                            "License Issued",
+                            &format!("License created successfully!\n\nSignature:\n{}\n\nProduct: {}\nDuration: {} days", sig, product_id, days)
+                        ));
                         self.form_fields.clear();
+                        self.input.clear();
                     }
                     Err(e) => {
                         self.status_message = format!("❌ Error: {}", e);
+                        self.notification_modal = Some(NotificationModal::error(
+                            "Transaction Failed",
+                            &format!("Failed to issue license:\n\n{}", e)
+                        ));
+                        self.input.clear();
                     }
                 }
             }
@@ -357,11 +372,21 @@ impl App {
                 
                 match client.op_extend_license(&owner.to_string(), days) {
                     Ok(sig) => {
-                        self.status_message = format!("✅ License extended!\nSignature: {}", sig);
+                        self.status_message = format!("✅ License extended! Signature: {}", sig);
+                        self.notification_modal = Some(NotificationModal::success(
+                            "License Extended",
+                            &format!("License extended successfully!\n\nSignature:\n{}\n\nAdditional days: {}", sig, days)
+                        ));
                         self.form_fields.clear();
+                        self.input.clear();
                     }
                     Err(e) => {
                         self.status_message = format!("❌ Error: {}", e);
+                        self.notification_modal = Some(NotificationModal::error(
+                            "Transaction Failed",
+                            &format!("Failed to extend license:\n\n{}", e)
+                        ));
+                        self.input.clear();
                     }
                 }
             }
@@ -418,11 +443,21 @@ impl App {
                 
                 match client.op_revoke_license(&owner.to_string()) {
                     Ok(sig) => {
-                        self.status_message = format!("✅ License revoked!\nSignature: {}", sig);
+                        self.status_message = format!("✅ License revoked! Signature: {}", sig);
+                        self.notification_modal = Some(NotificationModal::success(
+                            "License Revoked",
+                            &format!("License revoked successfully!\n\nSignature:\n{}\n\n⚠️  This action is permanent!", sig)
+                        ));
                         self.form_fields.clear();
+                        self.input.clear();
                     }
                     Err(e) => {
                         self.status_message = format!("❌ Error: {}", e);
+                        self.notification_modal = Some(NotificationModal::error(
+                            "Transaction Failed",
+                            &format!("Failed to revoke license:\n\n{}", e)
+                        ));
+                        self.input.clear();
                     }
                 }
             }
@@ -448,14 +483,24 @@ impl App {
                     Ok(license) => {
                         use license_sdk::pda::derive_license_pda;
                         let (pda, bump) = derive_license_pda(&owner);
-                        self.status_message = format!(
-                            "✅ License Found!\nPDA: {}\nBump: {}\nOwner: {}\nProduct: {}\nExpires: {}\nRevoked: {}",
-                            pda, bump, license.owner, license.product_id, license.expires_at, license.is_revoked
-                        );
+                        self.status_message = format!("✅ License found!");
+                        self.notification_modal = Some(NotificationModal::info(
+                            "License Details",
+                            &format!(
+                                "PDA: {}\nBump: {}\n\nOwner: {}\nProduct: {}\nExpires: {}\nRevoked: {}",
+                                pda, bump, license.owner, license.product_id, license.expires_at, license.is_revoked
+                            )
+                        ));
                         self.form_fields.clear();
+                        self.input.clear();
                     }
                     Err(e) => {
                         self.status_message = format!("❌ Error: {}", e);
+                        self.notification_modal = Some(NotificationModal::error(
+                            "License Not Found",
+                            &format!("Failed to fetch license:\n\n{}", e)
+                        ));
+                        self.input.clear();
                     }
                 }
             }

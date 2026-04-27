@@ -48,6 +48,10 @@ pub fn render(f: &mut Frame, app: &App) {
     if let Some(modal) = &app.confirm_modal {
         modal.render(f, &app.theme);
     }
+
+    if let Some(notification) = &app.notification_modal {
+        notification.render(f, &app.theme);
+    }
 }
 
 fn render_menu(f: &mut Frame, app: &App, area: ratatui::layout::Rect) {
