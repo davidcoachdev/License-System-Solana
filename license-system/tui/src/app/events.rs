@@ -441,6 +441,34 @@ impl App {
                     }
                 };
                 
+                match client.get_license(&owner.to_string()) {
+                    Ok(license) => {
+                        if license.is_revoked {
+                            self.status_message = "❌ License is revoked".to_string();
+                            self.modal = Some(Modal::error(
+                                "Cannot Extend Revoked License",
+                                &format!(
+                                    "This license has been permanently revoked.\n\n\
+                                    Owner: {}\n\
+                                    Product: {}\n\
+                                    Revoked: Yes\n\n\
+                                    You cannot extend a revoked license.",
+                                    license.owner, license.product_id
+                                )
+                            ));
+                            return;
+                        }
+                    }
+                    Err(_) => {
+                        self.status_message = "❌ License not found".to_string();
+                        self.modal = Some(Modal::error(
+                            "License Not Found",
+                            "No license found for this owner.\n\nCreate a license first."
+                        ));
+                        return;
+                    }
+                }
+                
                 let days: i64 = duration_str
                     .split_whitespace()
                     .next()
