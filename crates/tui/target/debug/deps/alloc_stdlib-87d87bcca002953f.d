@@ -1,9 +1,0 @@
-/home/dcdebian/Proyects/License-System-on-Solana/crates/tui/target/debug/deps/alloc_stdlib-87d87bcca002953f.d: /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alloc-stdlib-0.2.2/src/lib.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alloc-stdlib-0.2.2/src/heap_alloc.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alloc-stdlib-0.2.2/src/std_alloc.rs
-
-/home/dcdebian/Proyects/License-System-on-Solana/crates/tui/target/debug/deps/liballoc_stdlib-87d87bcca002953f.rlib: /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alloc-stdlib-0.2.2/src/lib.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alloc-stdlib-0.2.2/src/heap_alloc.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alloc-stdlib-0.2.2/src/std_alloc.rs
-
-/home/dcdebian/Proyects/License-System-on-Solana/crates/tui/target/debug/deps/liballoc_stdlib-87d87bcca002953f.rmeta: /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alloc-stdlib-0.2.2/src/lib.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alloc-stdlib-0.2.2/src/heap_alloc.rs /home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alloc-stdlib-0.2.2/src/std_alloc.rs
-
-/home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alloc-stdlib-0.2.2/src/lib.rs:
-/home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alloc-stdlib-0.2.2/src/heap_alloc.rs:
-/home/dcdebian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alloc-stdlib-0.2.2/src/std_alloc.rs:
