@@ -155,8 +155,13 @@ impl Modal {
     }
 
     fn render_notification(&self, f: &mut Frame, theme: &Theme, notification_type: &NotificationType) {
-        let area = centered_rect(50, 30, f.area());
+        let area = centered_rect(60, 40, f.area());
         f.render_widget(Clear, area);
+        
+        f.render_widget(
+            Block::default().style(Style::default().bg(theme.bg)),
+            area
+        );
         
         let color = match notification_type {
             NotificationType::Success => theme.success,
@@ -164,6 +169,14 @@ impl Modal {
             NotificationType::Info => theme.accent,
             NotificationType::Warning => theme.warning,
         };
+        
+        let chunks = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints([
+                Constraint::Min(3),
+                Constraint::Length(3),
+            ])
+            .split(area);
         
         let message_block = Paragraph::new(self.message.as_str())
             .alignment(Alignment::Center)
@@ -175,7 +188,12 @@ impl Modal {
                     .title(self.title.as_str())
                     .title_style(Style::default().fg(color).add_modifier(Modifier::BOLD)),
             );
-        f.render_widget(message_block, area);
+        f.render_widget(message_block, chunks[0]);
+        
+        let help = Paragraph::new("Press any key to continue")
+            .alignment(Alignment::Center)
+            .style(Style::default().fg(theme.muted).bg(theme.bg));
+        f.render_widget(help, chunks[1]);
     }
 
     fn render_confirm(&self, f: &mut Frame, theme: &Theme, confirm_text: &str, cancel_text: &str, selected: bool) {
