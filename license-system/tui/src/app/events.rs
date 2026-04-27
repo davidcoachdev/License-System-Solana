@@ -9,6 +9,7 @@ impl App {
     pub fn handle_key(&mut self, key: KeyEvent) -> bool {
         if let Some(_) = &self.notification_modal {
             self.notification_modal = None;
+            self.status_message = "Ready".to_string();
             return false;
         }
 
@@ -312,6 +313,10 @@ impl App {
                     Ok(pk) => pk,
                     Err(_) => {
                         self.status_message = "❌ Invalid owner pubkey".to_string();
+                        self.notification_modal = Some(NotificationModal::error(
+                            "Invalid Pubkey",
+                            "The owner pubkey is invalid.\n\nMake sure it's a valid Solana pubkey (43-44 characters).\n\nExample:\n3whY1ohdAV3uRXSpyzsKtwLg84X9fTZ1pSdCS8Vvqt7c"
+                        ));
                         return;
                     }
                 };
@@ -366,6 +371,10 @@ impl App {
                     Ok(pk) => pk,
                     Err(_) => {
                         self.status_message = "❌ Invalid owner pubkey".to_string();
+                        self.notification_modal = Some(NotificationModal::error(
+                            "Invalid Pubkey",
+                            "The owner pubkey is invalid.\n\nMake sure it's a valid Solana pubkey (43-44 characters).\n\nExample:\n3whY1ohdAV3uRXSpyzsKtwLg84X9fTZ1pSdCS8Vvqt7c"
+                        ));
                         return;
                     }
                 };
@@ -411,6 +420,10 @@ impl App {
                     Ok(pk) => pk,
                     Err(_) => {
                         self.status_message = "❌ Invalid owner pubkey".to_string();
+                        self.notification_modal = Some(NotificationModal::error(
+                            "Invalid Pubkey",
+                            "The owner pubkey is invalid.\n\nMake sure it's a valid Solana pubkey (43-44 characters).\n\nExample:\n3whY1ohdAV3uRXSpyzsKtwLg84X9fTZ1pSdCS8Vvqt7c"
+                        ));
                         return;
                     }
                 };
@@ -443,6 +456,10 @@ impl App {
                     Ok(pk) => pk,
                     Err(_) => {
                         self.status_message = "❌ Invalid owner pubkey".to_string();
+                        self.notification_modal = Some(NotificationModal::error(
+                            "Invalid Pubkey",
+                            "The owner pubkey is invalid.\n\nMake sure it's a valid Solana pubkey (43-44 characters).\n\nExample:\n3whY1ohdAV3uRXSpyzsKtwLg84X9fTZ1pSdCS8Vvqt7c"
+                        ));
                         return;
                     }
                 };
@@ -481,6 +498,10 @@ impl App {
                     Ok(pk) => pk,
                     Err(_) => {
                         self.status_message = "❌ Invalid owner pubkey".to_string();
+                        self.notification_modal = Some(NotificationModal::error(
+                            "Invalid Pubkey",
+                            "The owner pubkey is invalid.\n\nMake sure it's a valid Solana pubkey (43-44 characters).\n\nExample:\n3whY1ohdAV3uRXSpyzsKtwLg84X9fTZ1pSdCS8Vvqt7c"
+                        ));
                         return;
                     }
                 };
