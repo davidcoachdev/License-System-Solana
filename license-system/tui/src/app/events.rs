@@ -57,23 +57,28 @@ impl App {
                 match self.selected {
                     0 => {
                         self.screen = Screen::IssueLicense;
-                        self.status_message = "Issue License - Enter: owner_pubkey,product_id,days".to_string();
+                        self.setup_form_for_screen();
+                        self.status_message = "Issue License - Fill the form".to_string();
                     }
                     1 => {
                         self.screen = Screen::ExtendLicense;
-                        self.status_message = "Extend License - Enter: owner_pubkey,additional_days".to_string();
+                        self.setup_form_for_screen();
+                        self.status_message = "Extend License - Fill the form".to_string();
                     }
                     2 => {
                         self.screen = Screen::ValidateLicense;
-                        self.status_message = "Validate License - Enter: owner_pubkey,product_id".to_string();
+                        self.setup_form_for_screen();
+                        self.status_message = "Validate License - Fill the form".to_string();
                     }
                     3 => {
                         self.screen = Screen::RevokeLicense;
-                        self.status_message = "Revoke License - Enter: owner_pubkey".to_string();
+                        self.setup_form_for_screen();
+                        self.status_message = "Revoke License - Fill the form".to_string();
                     }
                     4 => {
                         self.screen = Screen::ListLicenses;
-                        self.status_message = "List Licenses - Enter: owner_pubkey".to_string();
+                        self.setup_form_for_screen();
+                        self.status_message = "List Licenses - Fill the form".to_string();
                     }
                     5 => {
                         self.screen = Screen::Settings;
@@ -216,13 +221,29 @@ impl App {
                 self.screen = Screen::Main;
                 self.selected = 0;
                 self.input.clear();
+                self.form_fields.clear();
+                self.form_index = 0;
                 self.status_message = "Returned to main menu".to_string();
             }
+            KeyCode::Up => {
+                if self.form_index > 0 {
+                    self.form_index -= 1;
+                }
+            }
+            KeyCode::Down => {
+                if self.form_index < self.form_fields.len().saturating_sub(1) {
+                    self.form_index += 1;
+                }
+            }
             KeyCode::Char(c) => {
-                self.input.push(c);
+                if self.form_index < self.form_fields.len() {
+                    self.form_fields[self.form_index].value.push(c);
+                }
             }
             KeyCode::Backspace => {
-                self.input.pop();
+                if self.form_index < self.form_fields.len() {
+                    self.form_fields[self.form_index].value.pop();
+                }
             }
             KeyCode::Enter => {
                 self.execute_action();
@@ -238,38 +259,48 @@ impl App {
             return;
         }
 
+        for field in &self.form_fields {
+            if field.required && field.value.trim().is_empty() {
+                self.status_message = format!("❌ '{}' is required", field.label);
+                return;
+            }
+        }
+
         let client = self.sdk_client.as_ref().unwrap();
 
         match self.screen {
             Screen::IssueLicense => {
-                let parts: Vec<&str> = self.input.split(',').collect();
-                if parts.len() != 3 {
-                    self.status_message = "Format: owner_pubkey,product_id,days".to_string();
+                if self.form_fields.len() < 3 {
+                    self.status_message = "❌ Form not initialized".to_string();
                     return;
                 }
                 
-                let owner = match Pubkey::from_str(parts[0].trim()) {
+                let owner_str = &self.form_fields[0].value;
+                let product_id = &self.form_fields[1].value;
+                let days_str = &self.form_fields[2].value;
+                
+                let owner = match Pubkey::from_str(owner_str.trim()) {
                     Ok(pk) => pk,
                     Err(_) => {
-                        self.status_message = "Invalid owner pubkey".to_string();
+                        self.status_message = "❌ Invalid owner pubkey".to_string();
                         return;
                     }
                 };
                 
-                let product_id = parts[1].trim().to_string();
-                let days: i64 = match parts[2].trim().parse() {
+                let days: i64 = match days_str.trim().parse() {
                     Ok(d) => d,
                     Err(_) => {
-                        self.status_message = "Invalid days number".to_string();
+                        self.status_message = "❌ Invalid days number".to_string();
                         return;
                     }
                 };
 
                 self.status_message = "Issuing license...".to_string();
                 
-                match client.op_issue_license(&owner.to_string(), &product_id, days) {
+                match client.op_issue_license(&owner.to_string(), product_id, days) {
                     Ok(sig) => {
                         self.status_message = format!("✅ License issued!\nSignature: {}", sig);
+                        self.form_fields.clear();
                     }
                     Err(e) => {
                         self.status_message = format!("❌ Error: {}", e);
@@ -277,24 +308,26 @@ impl App {
                 }
             }
             Screen::ExtendLicense => {
-                let parts: Vec<&str> = self.input.split(',').collect();
-                if parts.len() != 2 {
-                    self.status_message = "Format: owner_pubkey,additional_days".to_string();
+                if self.form_fields.len() < 2 {
+                    self.status_message = "❌ Form not initialized".to_string();
                     return;
                 }
                 
-                let owner = match Pubkey::from_str(parts[0].trim()) {
+                let owner_str = &self.form_fields[0].value;
+                let days_str = &self.form_fields[1].value;
+                
+                let owner = match Pubkey::from_str(owner_str.trim()) {
                     Ok(pk) => pk,
                     Err(_) => {
-                        self.status_message = "Invalid owner pubkey".to_string();
+                        self.status_message = "❌ Invalid owner pubkey".to_string();
                         return;
                     }
                 };
                 
-                let days: i64 = match parts[1].trim().parse() {
+                let days: i64 = match days_str.trim().parse() {
                     Ok(d) => d,
                     Err(_) => {
-                        self.status_message = "Invalid days number".to_string();
+                        self.status_message = "❌ Invalid days number".to_string();
                         return;
                     }
                 };
@@ -304,6 +337,7 @@ impl App {
                 match client.op_extend_license(&owner.to_string(), days) {
                     Ok(sig) => {
                         self.status_message = format!("✅ License extended!\nSignature: {}", sig);
+                        self.form_fields.clear();
                     }
                     Err(e) => {
                         self.status_message = format!("❌ Error: {}", e);
@@ -311,32 +345,41 @@ impl App {
                 }
             }
             Screen::ValidateLicense => {
-                let parts: Vec<&str> = self.input.split(',').collect();
-                if parts.len() != 2 {
-                    self.status_message = "Format: owner_pubkey,product_id".to_string();
+                if self.form_fields.len() < 2 {
+                    self.status_message = "❌ Form not initialized".to_string();
                     return;
                 }
                 
-                let owner = match Pubkey::from_str(parts[0].trim()) {
+                let owner_str = &self.form_fields[0].value;
+                let product_id = &self.form_fields[1].value;
+                
+                let owner = match Pubkey::from_str(owner_str.trim()) {
                     Ok(pk) => pk,
                     Err(_) => {
-                        self.status_message = "Invalid owner pubkey".to_string();
+                        self.status_message = "❌ Invalid owner pubkey".to_string();
                         return;
                     }
                 };
                 
-                let product_id = parts[1].trim();
                 let (license_pda, bump) = client.derive_license_pda(&owner);
                 self.status_message = format!(
-                    "✅ Ready to validate!\nPDA: {}\nBump: {}",
-                    license_pda, bump
+                    "✅ Ready to validate!\nPDA: {}\nBump: {}\nProduct: {}",
+                    license_pda, bump, product_id
                 );
+                self.form_fields.clear();
             }
             Screen::RevokeLicense => {
-                let owner = match Pubkey::from_str(self.input.trim()) {
+                if self.form_fields.is_empty() {
+                    self.status_message = "❌ Form not initialized".to_string();
+                    return;
+                }
+                
+                let owner_str = &self.form_fields[0].value;
+                
+                let owner = match Pubkey::from_str(owner_str.trim()) {
                     Ok(pk) => pk,
                     Err(_) => {
-                        self.status_message = "Invalid owner pubkey".to_string();
+                        self.status_message = "❌ Invalid owner pubkey".to_string();
                         return;
                     }
                 };
@@ -346,6 +389,7 @@ impl App {
                 match client.op_revoke_license(&owner.to_string()) {
                     Ok(sig) => {
                         self.status_message = format!("✅ License revoked!\nSignature: {}", sig);
+                        self.form_fields.clear();
                     }
                     Err(e) => {
                         self.status_message = format!("❌ Error: {}", e);
@@ -353,10 +397,17 @@ impl App {
                 }
             }
             Screen::ListLicenses => {
-                let owner = match Pubkey::from_str(self.input.trim()) {
+                if self.form_fields.is_empty() {
+                    self.status_message = "❌ Form not initialized".to_string();
+                    return;
+                }
+                
+                let owner_str = &self.form_fields[0].value;
+                
+                let owner = match Pubkey::from_str(owner_str.trim()) {
                     Ok(pk) => pk,
                     Err(_) => {
-                        self.status_message = "Invalid owner pubkey".to_string();
+                        self.status_message = "❌ Invalid owner pubkey".to_string();
                         return;
                     }
                 };
@@ -371,6 +422,7 @@ impl App {
                             "✅ License Found!\nPDA: {}\nBump: {}\nOwner: {}\nProduct: {}\nExpires: {}\nRevoked: {}",
                             pda, bump, license.owner, license.product_id, license.expires_at, license.is_revoked
                         );
+                        self.form_fields.clear();
                     }
                     Err(e) => {
                         self.status_message = format!("❌ Error: {}", e);
@@ -379,7 +431,5 @@ impl App {
             }
             _ => {}
         }
-        
-        self.input.clear();
     }
 }

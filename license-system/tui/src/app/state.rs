@@ -52,6 +52,44 @@ impl App {
         }
     }
 
+    pub fn setup_form_for_screen(&mut self) {
+        self.form_fields.clear();
+        self.form_index = 0;
+        
+        match self.screen {
+            Screen::IssueLicense => {
+                self.form_fields = vec![
+                    FormField::new("Owner Pubkey", "Pubkey of license owner", true),
+                    FormField::new("Product ID", "e.g. premium-plan", true),
+                    FormField::new("Duration (days)", "e.g. 30", true),
+                ];
+            }
+            Screen::ExtendLicense => {
+                self.form_fields = vec![
+                    FormField::new("Owner Pubkey", "Pubkey of license owner", true),
+                    FormField::new("Additional Days", "e.g. 15", true),
+                ];
+            }
+            Screen::ValidateLicense => {
+                self.form_fields = vec![
+                    FormField::new("Owner Pubkey", "Pubkey of license owner", true),
+                    FormField::new("Product ID", "e.g. premium-plan", true),
+                ];
+            }
+            Screen::RevokeLicense => {
+                self.form_fields = vec![
+                    FormField::new("Owner Pubkey", "Pubkey of license owner", true),
+                ];
+            }
+            Screen::ListLicenses => {
+                self.form_fields = vec![
+                    FormField::new("Owner Pubkey", "Pubkey of license owner", true),
+                ];
+            }
+            _ => {}
+        }
+    }
+
     pub fn menu_items(&self) -> Vec<&str> {
         match self.screen {
             Screen::Settings | Screen::SettingsTheme | Screen::SettingsNetwork => {
