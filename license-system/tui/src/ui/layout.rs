@@ -1,5 +1,5 @@
 use ratatui::{
-    layout::{Alignment, Constraint, Direction, Layout},
+    layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Modifier, Style},
     text::{Line, Span},
     widgets::{Block, Borders, List, ListItem, Paragraph},
@@ -197,6 +197,12 @@ fn render_content(f: &mut Frame, app: &App, area: ratatui::layout::Rect) {
             );
             f.render_widget(network_list, area);
         }
+        Screen::ViewAllLicenses => {
+            render_all_licenses_table(f, app, area);
+        }
+        Screen::ViewRevokedHistory => {
+            render_revoked_history(f, app, area);
+        }
         Screen::IssueLicense | Screen::ExtendLicense | Screen::ValidateLicense | 
         Screen::RevokeLicense | Screen::ListLicenses => {
             crate::ui::forms::render_form(f, app, area);
@@ -357,6 +363,18 @@ fn render_help_popup(f: &mut Frame, app: &App) {
             Example:\n\
             3whY1ohdAV3uRXSpyzsKtwLg84X9fTZ1pSdCS8Vvqt7c"
         }
+        Screen::ViewAllLicenses => {
+            "View All Licenses - Keyboard Shortcuts\n\n\
+            ESC       Return to main menu\n\
+            F1 or ?   Toggle this help\n\n\
+            Shows all licenses in the system"
+        }
+        Screen::ViewRevokedHistory => {
+            "Revoked History - Keyboard Shortcuts\n\n\
+            ESC       Return to main menu\n\
+            F1 or ?   Toggle this help\n\n\
+            Shows history of revoked licenses"
+        }
     };
 
     let area = centered_rect(60, 70, f.area());
@@ -395,4 +413,92 @@ fn centered_rect(percent_x: u16, percent_y: u16, r: ratatui::layout::Rect) -> ra
             Constraint::Percentage((100 - percent_x) / 2),
         ])
         .split(popup_layout[1])[1]
+}
+
+fn render_all_licenses_table(f: &mut Frame, app: &App, area: Rect) {
+    let t = &app.theme;
+    
+    let licenses_text = if let Some(client) = &app.sdk_client {
+        match client.get_all_licenses() {
+            Ok(licenses) => {
+                if licenses.is_empty() {
+                    "No licenses found.\n\nCreate a license first.".to_string()
+                } else {
+                    let mut text = format!("Total Licenses: {}\n\n", licenses.len());
+                    for (i, license) in licenses.iter().enumerate() {
+                        let status = if license.is_revoked {
+                            "❌ Revoked"
+                        } else {
+                            "✅ Active"
+                        };
+                        text.push_str(&format!(
+                            "{}. Owner: {}...{}\n   Product: {}\n   Expires: {}\n   Status: {}\n\n",
+                            i + 1,
+                            &license.owner.to_string()[..6],
+                            &license.owner.to_string()[license.owner.to_string().len()-4..],
+                            license.product_id,
+                            license.expires_at,
+                            status
+                        ));
+                    }
+                    text
+                }
+            }
+            Err(e) => format!("Error fetching licenses:\n\n{}", e),
+        }
+    } else {
+        "SDK not initialized".to_string()
+    };
+    
+    let table = Paragraph::new(licenses_text)
+        .style(Style::default().fg(t.fg).bg(t.bg))
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(t.border))
+                .title("All Licenses")
+                .title_style(Style::default().fg(t.title).add_modifier(Modifier::BOLD)),
+        )
+        .wrap(ratatui::widgets::Wrap { trim: false });
+    
+    f.render_widget(table, area);
+}
+
+fn render_revoked_history(f: &mut Frame, app: &App, area: Rect) {
+    let t = &app.theme;
+    
+    use crate::app::LicenseHistory;
+    let history = LicenseHistory::load();
+    
+    let history_text = if history.revoked_licenses.is_empty() {
+        "No revoked licenses in history.\n\nRe license to see it here.".to_string()
+    } else {
+        let mut text = format!("Total Revoked: {}\n\n", history.revoked_licenses.len());
+        for (i, revoked) in history.revoked_licenses.iter().enumerate() {
+            text.push_str(&format!(
+                "{}. Owner: {}...{}\n   Product: {}\n   Revoked At: {}\n   Signature: {}\n\n",
+                i + 1,
+                &revoked.owner[..6],
+                &revoked.owner[revoked.owner.len()-4..],
+                revoked.product_id,
+                revoked.revoked_at,
+                &revoked.revoke_signature[..20]
+            ));
+        }
+        text.push_str("\nHistory file: ~/.config/license-tui/revoked_history.json");
+        text
+    };
+    
+    let table = Paragraph::new(history_text)
+        .style(Style::default().fg(t.fg).bg(t.bg))
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(t.border))
+                .title("Revoked History")
+                .title_style(Style::default().fg(t.title).add_modifier(Modifier::BOLD)),
+        )
+        .wrap(ratatui::widgets::Wrap { trim: false });
+    
+    f.render_widget(table, area);
 }

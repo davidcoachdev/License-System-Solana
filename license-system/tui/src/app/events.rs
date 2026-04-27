@@ -94,6 +94,17 @@ impl App {
             Screen::Settings => self.handle_settings_menu(key),
             Screen::SettingsTheme => self.handle_theme_selection(key),
             Screen::SettingsNetwork => self.handle_network_selection(key),
+            Screen::ViewAllLicenses | Screen::ViewRevokedHistory => {
+                match key.code {
+                    KeyCode::Esc => {
+                        self.screen = Screen::Main;
+                        self.selected = 0;
+                        self.status_message = "Returned to main menu".to_string();
+                    }
+                    _ => {}
+                }
+                false
+            }
             _ => self.handle_input_screen(key),
         }
     }
