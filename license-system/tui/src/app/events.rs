@@ -12,6 +12,8 @@ impl App {
                 ModalType::Notification { .. } => {
                     self.modal = None;
                     self.status_message = "Ready".to_string();
+                    self.screen = Screen::Main;
+                    self.selected = 0;
                     return false;
                 }
                 ModalType::Confirm { .. } => {
