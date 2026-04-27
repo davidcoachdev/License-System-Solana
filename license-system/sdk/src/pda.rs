@@ -3,7 +3,7 @@ use std::str::FromStr;
 
 use crate::error::Result;
 
-pub const PROGRAM_ID: &str = "5pXEX8z1aTSnm7jCKqvJCXezczKPVuPQif2BZh5u5Axq";
+pub const PROGRAM_ID: &str = "H93kfiExrB3hCMCxkvnCRDC3PGuGC5cyL7eh6VfmgfaB";
 
 pub fn program_id() -> Result<Pubkey> {
     Pubkey::from_str(PROGRAM_ID).map_err(|e| crate::error::SdkError::InvalidInput(format!("Invalid program ID: {}", e)).into())

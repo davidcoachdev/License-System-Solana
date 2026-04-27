@@ -6,10 +6,10 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-license_system = "5pXEX8z1aTSnm7jCKqvJCXezczKPVuPQif2BZh5u5Axq"
+license_system = "H93kfiExrB3hCMCxkvnCRDC3PGuGC5cyL7eh6VfmgfaB"
 
 [programs.devnet]
-license_system = "5pXEX8z1aTSnm7jCKqvJCXezczKPVuPQif2BZh5u5Axq"
+license_system = "H93kfiExrB3hCMCxkvnCRDC3PGuGC5cyL7eh6VfmgfaB"
 
 [registry]
 url = "https://api.apr.dev"
