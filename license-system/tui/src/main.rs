@@ -91,6 +91,32 @@ impl App {
                     self.status_message = "List Licenses - Enter: owner_pubkey".to_string();
                 }
                 KeyCode::Char('6') | KeyCode::Char('q') => return true,
+                KeyCode::Enter => {
+                    match self.selected {
+                        0 => {
+                            self.screen = Screen::IssueLicense;
+                            self.status_message = "Issue License - Enter: owner_pubkey,product_id,days".to_string();
+                        }
+                        1 => {
+                            self.screen = Screen::ExtendLicense;
+                            self.status_message = "Extend License - Enter: owner_pubkey,additional_days".to_string();
+                        }
+                        2 => {
+                            self.screen = Screen::ValidateLicense;
+                            self.status_message = "Validate License - Enter: owner_pubkey,product_id".to_string();
+                        }
+                        3 => {
+                            self.screen = Screen::RevokeLicense;
+                            self.status_message = "Revoke License - Enter: owner_pubkey".to_string();
+                        }
+                        4 => {
+                            self.screen = Screen::ListLicenses;
+                            self.status_message = "List Licenses - Enter: owner_pubkey".to_string();
+                        }
+                        5 => return true,
+                        _ => {}
+                    }
+                }
                 KeyCode::Down => {
                     self.selected = (self.selected + 1) % self.menu_items().len();
                 }
