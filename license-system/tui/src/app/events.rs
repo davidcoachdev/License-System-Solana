@@ -277,12 +277,15 @@ impl App {
                             "Enter password to switch to mainnet"
                         ));
                     } else {
-                        self.pending_network = Some(new_network.clone());
-                        self.modal = Some(Modal::progress(
-                            "🌐 Switching Network",
-                            &format!("Connecting to {}...", new_network),
-                            0
+                        self.network = new_network.clone();
+                        self.status_message = format!("✅ Network changed to: {}", new_network);
+                        self.modal = Some(Modal::success(
+                            "Network Changed",
+                            &format!("Successfully switched to {}", new_network)
                         ));
+                        self.save_config();
+                        self.screen = Screen::Settings;
+                        self.selected = 2;
                     }
                 }
             }
