@@ -675,7 +675,7 @@ impl App {
                             "License Details",
                             &format!(
                                 "PDA: {}\nBump: {}\n\nOwner: {}\nProduct: {}\nExpires: {}\nRevoked: {}",
-                                pda, bump, license.owner, license.product_id, license.expires_at, license.is_revoked
+                                pda, bump, license.owner, license.product_id, App::format_timestamp(license.expires_at), license.is_revoked
                             )
                         ));
                         self.form_fields.clear();
