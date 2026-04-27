@@ -1,4 +1,4 @@
-# 🧾 License System on Solana
+# 🧾 License System Solana
 
 Sistema de gestión de licencias descentralizado en Solana con TUI profesional, SDK completo, y arquitectura production-ready.
 
