@@ -37,16 +37,12 @@ pub fn render_form(f: &mut Frame, app: &App, area: Rect) {
                 format!("{}  {}", bar, field.value)
             }
         } else if field.value.is_empty() {
-            if is_active {
-                format!("{}  | {}", bar, field.placeholder)
-            } else {
-                format!("{}  {}", bar, field.placeholder)
-            }
+            format!("{}  {}", bar, field.placeholder)
         } else {
             if field.masked {
-                format!("{}  {}", bar, "*".repeat(field.value.len()))
+                format!("{}  {} |", bar, "*".repeat(field.value.len()))
             } else {
-                format!("{}  {}", bar, field.value)
+                format!("{}  {} |", bar, field.value)
             }
         };
         
