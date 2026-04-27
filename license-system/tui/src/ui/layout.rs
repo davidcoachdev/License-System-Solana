@@ -73,7 +73,7 @@ fn render_menu(f: &mut Frame, app: &App, area: ratatui::layout::Rect) {
             } else {
                 Style::default().fg(t.fg).bg(t.bg)
             };
-            let prefix = "  ";
+            let prefix = if is_selected { "▸ " } else { "  " };
             ListItem::new(Line::from(Span::styled(format!("{}{}", prefix, item), style)))
         })
         .collect();
