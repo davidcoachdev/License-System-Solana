@@ -49,9 +49,9 @@ impl App {
 
     pub fn menu_items(&self) -> Vec<&str> {
         match self.screen {
-            Screen::Settings => vec!["← Back", "Theme", "Network"],
-            Screen::SettingsTheme => vec!["← Back", "Dark", "Light", "Dracula", "Nord", "Gruvbox"],
-            Screen::SettingsNetwork => vec!["← Back", "Localnet", "Devnet", "Mainnet"],
+            Screen::Settings | Screen::SettingsTheme | Screen::SettingsNetwork => {
+                vec!["← Back", "Theme", "Network"]
+            }
             _ => vec![
                 "Issue License",
                 "Extend License",
@@ -61,6 +61,25 @@ impl App {
                 "Settings",
                 "Exit",
             ],
+        }
+    }
+
+    pub fn settings_menu_items(&self) -> Vec<&str> {
+        vec!["← Back", "Theme", "Network"]
+    }
+
+    pub fn theme_options(&self) -> Vec<&str> {
+        vec!["Dark", "Light", "Dracula", "Nord", "Gruvbox"]
+    }
+
+    pub fn network_options(&self) -> Vec<&str> {
+        vec!["Localnet", "Devnet", "Mainnet"]
+    }
+
+    pub fn content_selected(&self) -> usize {
+        match self.screen {
+            Screen::SettingsTheme | Screen::SettingsNetwork => self.selected,
+            _ => 0,
         }
     }
 

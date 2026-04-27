@@ -81,12 +81,12 @@ impl App {
                     1 => {
                         self.screen = Screen::SettingsTheme;
                         self.selected = 0;
-                        self.status_message = "Select a theme".to_string();
+                        self.status_message = "Select a theme from the right panel".to_string();
                     }
                     2 => {
                         self.screen = Screen::SettingsNetwork;
                         self.selected = 0;
-                        self.status_message = "Select a network".to_string();
+                        self.status_message = "Select a network from the right panel".to_string();
                     }
                     _ => {}
                 }
@@ -110,34 +110,25 @@ impl App {
         match key.code {
             KeyCode::Esc => {
                 self.screen = Screen::Settings;
-                self.selected = 0;
+                self.selected = 1;
                 self.status_message = "Settings - Select an option".to_string();
             }
             KeyCode::Enter => {
-                if self.selected == 0 {
-                    self.screen = Screen::Settings;
-                    self.selected = 0;
-                    self.status_message = "Settings - Select an option".to_string();
-                } else {
-                    let themes = Theme::names();
-                    let theme_index = self.selected - 1;
-                    if theme_index < themes.len() {
-                        let theme_name = &themes[theme_index];
-                        self.theme = Theme::by_name(theme_name);
-                        self.status_message = format!("✅ Theme changed to: {}", theme_name);
-                        self.screen = Screen::Settings;
-                        self.selected = 0;
-                    }
+                let themes = vec!["dark", "light", "dracula", "nord", "gruvbox"];
+                if self.selected < themes.len() {
+                    let theme_name = themes[self.selected];
+                    self.theme = Theme::by_name(theme_name);
+                    self.status_message = format!("✅ Theme changed to: {}", theme_name);
                 }
             }
             KeyCode::Down => {
-                self.selected = (self.selected + 1) % 6;
+                self.selected = (self.selected + 1) % 5;
             }
             KeyCode::Up => {
                 if self.selected > 0 {
                     self.selected -= 1;
                 } else {
-                    self.selected = 5;
+                    self.selected = 4;
                 }
             }
             _ => {}
@@ -149,33 +140,24 @@ impl App {
         match key.code {
             KeyCode::Esc => {
                 self.screen = Screen::Settings;
-                self.selected = 0;
+                self.selected = 2;
                 self.status_message = "Settings - Select an option".to_string();
             }
             KeyCode::Enter => {
-                if self.selected == 0 {
-                    self.screen = Screen::Settings;
-                    self.selected = 0;
-                    self.status_message = "Settings - Select an option".to_string();
-                } else {
-                    let networks = vec!["localnet", "devnet", "mainnet"];
-                    let network_index = self.selected - 1;
-                    if network_index < networks.len() {
-                        self.network = networks[network_index].to_string();
-                        self.status_message = format!("✅ Network changed to: {}", self.network);
-                        self.screen = Screen::Settings;
-                        self.selected = 0;
-                    }
+                let networks = vec!["localnet", "devnet", "mainnet"];
+                if self.selected < networks.len() {
+                    self.network = networks[self.selected].to_string();
+                    self.status_message = format!("✅ Network changed to: {}", self.network);
                 }
             }
             KeyCode::Down => {
-                self.selected = (self.selected + 1) % 4;
+                self.selected = (self.selected + 1) % 3;
             }
             KeyCode::Up => {
                 if self.selected > 0 {
                     self.selected -= 1;
                 } else {
-                    self.selected = 3;
+                    self.selected = 2;
                 }
             }
             _ => {}

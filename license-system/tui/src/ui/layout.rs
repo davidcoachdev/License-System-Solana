@@ -102,35 +102,88 @@ fn render_content(f: &mut Frame, app: &App, area: ratatui::layout::Rect) {
             );
             f.render_widget(help, area);
         }
-        Screen::Settings | Screen::SettingsTheme | Screen::SettingsNetwork => {
-            let help_text = match app.screen {
-                Screen::Settings => "Select an option from the menu\n\n\
-                    Theme: Change color scheme\n\
-                    Network: Switch between localnet/devnet/mainnet\n\
-                    Back: Return to main menu",
-                Screen::SettingsTheme => "Select a theme from the menu\n\n\
-                    Dark: Dark blue theme (default)\n\
-                    Light: Light theme\n\
-                    Dracula: Dracula theme\n\
-                    Nord: Nord theme\n\
-                    Gruvbox: Gruvbox theme",
-                Screen::SettingsNetwork => "Select a network from the menu\n\n\
-                    Localnet: http://127.0.0.1:8899\n\
-                    Devnet: https://api.devnet.solana.com\n\
-                    Mainnet: https://api.mainnet-beta.solana.com",
-                _ => "",
-            };
-            
-            let help = Paragraph::new(help_text)
-                .style(Style::default().fg(t.muted).bg(t.bg))
-                .block(
-                    Block::default()
-                        .borders(Borders::ALL)
-                        .border_style(Style::default().fg(t.border))
-                        .title("Info")
-                        .title_style(Style::default().fg(t.title).add_modifier(Modifier::BOLD)),
-                );
+        Screen::Settings => {
+            let help = Paragraph::new(
+                "Select an option from the menu\n\n\
+                Theme: Change color scheme\n\
+                Network: Switch between localnet/devnet/mainnet\n\
+                Back: Return to main menu"
+            )
+            .style(Style::default().fg(t.muted).bg(t.bg))
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_style(Style::default().fg(t.border))
+                    .title("Info")
+                    .title_style(Style::default().fg(t.title).add_modifier(Modifier::BOLD)),
+            );
             f.render_widget(help, area);
+        }
+        Screen::SettingsTheme => {
+            let theme_items: Vec<ListItem> = app
+                .theme_options()
+                .iter()
+                .enumerate()
+                .map(|(i, name)| {
+                    let is_current = name.to_lowercase() == app.theme.name;
+                    let style = if i == app.content_selected() {
+                        Style::default()
+                            .fg(t.accent)
+                            .bg(t.highlight)
+                            .add_modifier(Modifier::BOLD)
+                    } else {
+                        Style::default().fg(t.fg).bg(t.bg)
+                    };
+                    let marker = if is_current { "●" } else { "○" };
+                    let prefix = if i == app.content_selected() { "▸ " } else { "  " };
+                    ListItem::new(Line::from(Span::styled(
+                        format!("{}{} {}", prefix, marker, name),
+                        style,
+                    )))
+                })
+                .collect();
+
+            let theme_list = List::new(theme_items).block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_style(Style::default().fg(t.border))
+                    .title("Select Theme")
+                    .title_style(Style::default().fg(t.title).add_modifier(Modifier::BOLD)),
+            );
+            f.render_widget(theme_list, area);
+        }
+        Screen::SettingsNetwork => {
+            let network_items: Vec<ListItem> = app
+                .network_options()
+                .iter()
+                .enumerate()
+                .map(|(i, name)| {
+                    let is_current = name.to_lowercase() == app.network;
+                    let style = if i == app.content_selected() {
+                        Style::default()
+                            .fg(t.accent)
+                            .bg(t.highlight)
+                            .add_modifier(Modifier::BOLD)
+                    } else {
+                        Style::default().fg(t.fg).bg(t.bg)
+                    };
+                    let marker = if is_current { "●" } else { "○" };
+                    let prefix = if i == app.content_selected() { "▸ " } else { "  " };
+                    ListItem::new(Line::from(Span::styled(
+                        format!("{}{} {}", prefix, marker, name),
+                        style,
+                    )))
+                })
+                .collect();
+
+            let network_list = List::new(network_items).block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_style(Style::default().fg(t.border))
+                    .title("Select Network")
+                    .title_style(Style::default().fg(t.title).add_modifier(Modifier::BOLD)),
+            );
+            f.render_widget(network_list, area);
         }
         _ => {
             let input_block = Paragraph::new(app.input.as_str())
