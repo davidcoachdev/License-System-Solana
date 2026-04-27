@@ -46,9 +46,7 @@ fn render_menu(f: &mut Frame, app: &App, area: ratatui::layout::Rect) {
     let t = &app.theme;
     
     let menu_title = match app.screen {
-        Screen::Settings => "Settings",
-        Screen::SettingsTheme => "Theme",
-        Screen::SettingsNetwork => "Network",
+        Screen::Settings | Screen::SettingsTheme | Screen::SettingsNetwork => "Settings",
         _ => "Menu",
     };
     
@@ -57,15 +55,21 @@ fn render_menu(f: &mut Frame, app: &App, area: ratatui::layout::Rect) {
         .iter()
         .enumerate()
         .map(|(i, item)| {
-            let style = if i == app.selected {
+            let is_selected = match app.screen {
+                Screen::Settings => i == app.selected,
+                Screen::SettingsTheme => i == 1,
+                Screen::SettingsNetwork => i == 2,
+                _ => i == app.selected,
+            };
+            
+            let style = if is_selected {
                 Style::default()
                     .fg(t.accent)
-                    .bg(t.highlight)
                     .add_modifier(Modifier::BOLD)
             } else {
                 Style::default().fg(t.fg).bg(t.bg)
             };
-            let prefix = if i == app.selected { "▸ " } else { "  " };
+            let prefix = "  ";
             ListItem::new(Line::from(Span::styled(format!("{}{}", prefix, item), style)))
         })
         .collect();

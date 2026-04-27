@@ -119,6 +119,8 @@ impl App {
                     let theme_name = themes[self.selected];
                     self.theme = Theme::by_name(theme_name);
                     self.status_message = format!("✅ Theme changed to: {}", theme_name);
+                    self.screen = Screen::Settings;
+                    self.selected = 1;
                 }
             }
             KeyCode::Down => {
@@ -148,6 +150,8 @@ impl App {
                 if self.selected < networks.len() {
                     self.network = networks[self.selected].to_string();
                     self.status_message = format!("✅ Network changed to: {}", self.network);
+                    self.screen = Screen::Settings;
+                    self.selected = 2;
                 }
             }
             KeyCode::Down => {
