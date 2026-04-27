@@ -2333,14 +2333,11 @@ dependencies = [
 name = "license-sdk"
 version = "0.1.0"
 dependencies = [
- "anchor-client",
- "anchor-lang",
  "anyhow",
  "serde",
  "solana-client",
  "solana-sdk",
  "thiserror 1.0.69",
- "tokio",
  "tokio-test",
 ]
 
