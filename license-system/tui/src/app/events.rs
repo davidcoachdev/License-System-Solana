@@ -491,16 +491,61 @@ impl App {
                     Some(plan) => plan.id,
                     None => {
                         self.status_message = "❌ Invalid plan selected".to_string();
+                        self.modal = Some(Modal::error(
+                            "Invalid Plan",
+                            "The selected plan is invalid."
+                        ));
                         return;
                     }
                 };
                 
-                let (license_pda, bump) = client.derive_license_pda(&owner);
-                self.status_message = format!(
-                    "✅ Ready to validate!\nPDA: {}\nBump: {}\nProduct: {}",
-                    license_pda, bump, product_id
-                );
-                self.form_fields.clear();
+                self.status_message = "Validating license...".to_string();
+                
+                match client.get_license(&owner.to_string()) {
+                    Ok(license) => {
+                        let is_valid = !license.is_revoked 
+                            && license.expires_at > chrono::Utc::now().timestamp()
+                            && license.product_id == product_id;
+                        
+                        if is_valid {
+                            self.status_message = "✅ License is valid!".to_string();
+                            self.modal = Some(Modal::success(
+                                "License Valid",
+                                &format!(
+                                    "License is VALID ✅\n\nOwner: {}\nProduct: {}\nExpires: {}\nStatus: Active",
+                                    license.owner, license.product_id, license.expires_at
+                                )
+                            ));
+                        } else {
+                            let reason = if license.is_revoked {
+                                "License has been revoked"
+                            } else if license.expires_at <= chrono::Utc::now().timestamp() {
+                                "License has expired"
+                            } else {
+                                "Product ID does not match"
+                            };
+                            
+                            self.status_message = "❌ License is invalid!".to_string();
+                            self.modal = Some(Modal::error(
+                                "License Invalid",
+                                &format!(
+                                    "License is INVALID ❌\n\nReason: {}\n\nOwner: {}\nProduct: {}\nExpires: {}\nRevoked: {}",
+                                    reason, license.owner, license.product_id, license.expires_at, license.is_revoked
+                                )
+                            ));
+                        }
+                        self.form_fields.clear();
+                        self.input.clear();
+                    }
+                    Err(e) => {
+                        self.status_message = "❌ License not found".to_string();
+                        self.modal = Some(Modal::error(
+                            "License Not Found",
+                            &format!("No license found for this owner.\n\n{}", e)
+                        ));
+                        self.input.clear();
+                    }
+                }
             }
             Screen::RevokeLicense => {
                 if self.form_fields.is_empty() {
