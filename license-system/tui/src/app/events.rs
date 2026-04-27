@@ -365,7 +365,8 @@ impl App {
                     return;
                 }
                 
-                let owner_str = &self.form_fields[0].value;
+                let owner_str_raw = &self.form_fields[0].value;
+                let owner_str = self.get_full_pubkey(owner_str_raw).unwrap_or_else(|| owner_str_raw.clone());
                 let plan_name = &self.form_fields[1].value;
                 let duration_str = &self.form_fields[2].value;
                 
@@ -424,7 +425,8 @@ impl App {
                     return;
                 }
                 
-                let owner_str = &self.form_fields[0].value;
+                let owner_str_raw = &self.form_fields[0].value;
+                let owner_str = self.get_full_pubkey(owner_str_raw).unwrap_or_else(|| owner_str_raw.clone());
                 let duration_str = &self.form_fields[1].value;
                 
                 let owner = match Pubkey::from_str(owner_str.trim()) {
@@ -473,7 +475,8 @@ impl App {
                     return;
                 }
                 
-                let owner_str = &self.form_fields[0].value;
+                let owner_str_raw = &self.form_fields[0].value;
+                let owner_str = self.get_full_pubkey(owner_str_raw).unwrap_or_else(|| owner_str_raw.clone());
                 let plan_name = &self.form_fields[1].value;
                 
                 let owner = match Pubkey::from_str(owner_str.trim()) {
@@ -555,7 +558,8 @@ impl App {
                     return;
                 }
                 
-                let owner_str = &self.form_fields[0].value;
+                let owner_str_raw = &self.form_fields[0].value;
+                let owner_str = self.get_full_pubkey(owner_str_raw).unwrap_or_else(|| owner_str_raw.clone());
                 
                 let owner = match Pubkey::from_str(owner_str.trim()) {
                     Ok(pk) => pk,
@@ -597,7 +601,8 @@ impl App {
                     return;
                 }
                 
-                let owner_str = &self.form_fields[0].value;
+                let owner_str_raw = &self.form_fields[0].value;
+                let owner_str = self.get_full_pubkey(owner_str_raw).unwrap_or_else(|| owner_str_raw.clone());
                 
                 let owner = match Pubkey::from_str(owner_str.trim()) {
                     Ok(pk) => pk,

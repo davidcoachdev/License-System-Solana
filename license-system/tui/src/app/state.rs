@@ -29,6 +29,7 @@ pub struct App {
     pub show_help_popup: bool,
     pub modal: Option<Modal>,
     pub pending_network: Option<String>,
+    pub license_cache: Vec<(String, String)>,
 }
 
 impl App {
@@ -51,6 +52,7 @@ impl App {
             show_help_popup: false,
             modal: None,
             pending_network: None,
+            license_cache: Vec::new(),
         }
     }
 
@@ -133,16 +135,20 @@ impl App {
         }
     }
 
-    fn get_existing_licenses(&self) -> Vec<String> {
+    fn get_existing_licenses(&mut self) -> Vec<String> {
+        self.license_cache.clear();
+        
         if let Some(client) = &self.sdk_client {
             match client.get_all_licenses() {
                 Ok(licenses) => {
                     licenses.iter().map(|l| {
-                        let short_owner = format!("{}...{}", 
-                            &l.owner.to_string()[..6], 
-                            &l.owner.to_string()[l.owner.to_string().len()-4..]
+                        let owner_str = l.owner.to_string();
+                        let short = format!("{}...{}", 
+                            &owner_str[..6], 
+                            &owner_str[owner_str.len()-4..]
                         );
-                        format!("{} - {}", short_owner, l.product_id)
+                        self.license_cache.push((short.clone(), owner_str));
+                        short
                     }).collect()
                 }
                 Err(_) => Vec::new(),
@@ -150,6 +156,12 @@ impl App {
         } else {
             Vec::new()
         }
+    }
+
+    pub fn get_full_pubkey(&self, short: &str) -> Option<String> {
+        self.license_cache.iter()
+            .find(|(s, _)| s == short)
+            .map(|(_, full)| full.clone())
     }
 
     pub fn menu_items(&self) -> Vec<&str> {
