@@ -25,6 +25,7 @@ pub struct App {
     pub form_index: usize,
     pub network: String,
     pub settings_items: Vec<String>,
+    pub show_help_popup: bool,
 }
 
 impl App {
@@ -44,6 +45,7 @@ impl App {
                 "Network".to_string(),
                 "Back".to_string(),
             ],
+            show_help_popup: false,
         }
     }
 

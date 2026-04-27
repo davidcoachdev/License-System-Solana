@@ -6,6 +6,16 @@ use crate::app::{App, Screen, Theme};
 
 impl App {
     pub fn handle_key(&mut self, key: KeyEvent) -> bool {
+        if key.code == KeyCode::F(1) || key.code == KeyCode::Char('?') {
+            self.show_help_popup = !self.show_help_popup;
+            return false;
+        }
+
+        if self.show_help_popup {
+            self.show_help_popup = false;
+            return false;
+        }
+
         match self.screen {
             Screen::Main => self.handle_main_menu(key),
             Screen::Settings => self.handle_settings_menu(key),

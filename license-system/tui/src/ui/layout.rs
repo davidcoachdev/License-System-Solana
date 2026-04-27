@@ -40,6 +40,10 @@ pub fn render(f: &mut Frame, app: &App) {
     render_menu(f, app, content_chunks[0]);
     render_content(f, app, content_chunks[1]);
     render_status_bar(f, app, main_chunks[2]);
+
+    if app.show_help_popup {
+        render_help_popup(f, app);
+    }
 }
 
 fn render_menu(f: &mut Frame, app: &App, area: ratatui::layout::Rect) {
@@ -245,4 +249,154 @@ fn render_status_bar(f: &mut Frame, app: &App, area: ratatui::layout::Rect) {
                 .title_style(Style::default().fg(t.title).add_modifier(Modifier::BOLD))
         );
     f.render_widget(status_right, status_chunks[1]);
+}
+
+fn render_help_popup(f: &mut Frame, app: &App) {
+    let t = &app.theme;
+    
+    let help_text = match app.screen {
+        Screen::Main => {
+            "Main Menu - Keyboard Shortcuts\n\n\
+            ↑↓        Navigate menu\n\
+            Enter     Select option\n\
+            q         Quit\n\
+            F1 or ?   Toggle this help\n\n\
+            Options:\n\
+            - Issue License: Create new license\n\
+            - Extend License: Add more days\n\
+            - Validate License: Check status\n\
+            - Revoke License: Permanently revoke\n\
+            - List Licenses: Show license info\n\
+            - Settings: Change theme/network"
+        }
+        Screen::Settings => {
+            "Settings - Keyboard Shortcuts\n\n\
+            ↑↓        Navigate menu\n\
+            Enter     Select option\n\
+            ESC       Return to main menu\n\
+            F1 or ?   Toggle this help\n\n\
+            Options:\n\
+            - Theme: Change color scheme\n\
+            - Network: Switch network\n\
+            - Back: Return to main menu"
+        }
+        Screen::SettingsTheme => {
+            "Theme Selection - Keyboard Shortcuts\n\n\
+            ↑↓        Navigate themes\n\
+            Enter     Apply theme\n\
+            ESC       Return to Settings\n\
+            F1 or ?   Toggle this help\n\n\
+            Available Themes:\n\
+            - Dc Studio: Dark red/burgundy (default)\n\
+            - Dark: Dark blue\n\
+            - Light: Light theme\n\
+            - Dracula: Dracula colors\n\
+            - Nord: Nord colors\n\
+            - Gruvbox: Gruvbox colors"
+        }
+        Screen::SettingsNetwork => {
+            "Network Selection - Keyboard Shortcuts\n\n\
+            ↑↓        Navigate networks\n\
+            Enter     Switch network\n\
+            ESC       Return to Settings\n\
+            F1 or ?   Toggle this help\n\n\
+            Available Networks:\n\
+            - Localnet: http://127.0.0.1:8899\n\
+            - Devnet: https://api.devnet.solana.com\n\
+            - Mainnet: https://api.mainnet-beta.solana.com"
+        }
+        Screen::IssueLicense => {
+            "Issue License - Keyboard Shortcuts\n\n\
+            Type      Enter data\n\
+            Enter     Execute transaction\n\
+            ESC       Return to main menu\n\
+            F1 or ?   Toggle this help\n\n\
+            Format:\n\
+            owner_pubkey,product_id,days\n\n\
+            Example:\n\
+            3whY1ohdAV3uRXSpyzsKtwLg84X9fTZ1pSdCS8Vvqt7c,premium-plan,30"
+        }
+        Screen::ExtendLicense => {
+            "Extend License - Keyboard Shortcuts\n\n\
+            Type      Enter data\n\
+            Enter     Execute transaction\n\
+            ESC       Return to main menu\n\
+            F1 or ?   Toggle this help\n\n\
+            Format:\n\
+            owner_pubkey,additional_days\n\n\
+            Example:\n\
+            3whY1ohdAV3uRXSpyzsKtwLg84X9fTZ1pSdCS8Vvqt7c,15"
+        }
+        Screen::ValidateLicense => {
+            "Validate License - Keyboard Shortcuts\n\n\
+            Type      Enter data\n\
+            Enter     Check license\n\
+            ESC       Return to main menu\n\
+            F1 or ?   Toggle this help\n\n\
+            Format:\n\
+            owner_pubkey,product_id\n\n\
+            Example:\n\
+            3whY1ohdAV3uRXSpyzsKtwLg84X9fTZ1pSdCS8Vvqt7c,premium-plan"
+        }
+        Screen::RevokeLicense => {
+            "Revoke License - Keyboard Shortcuts\n\n\
+            Type      Enter data\n\
+            Enter     Execute transaction\n\
+            ESC       Return to main menu\n\
+            F1 or ?   Toggle this help\n\n\
+            Format:\n\
+            owner_pubkey\n\n\
+            Example:\n\
+            3whY1ohdAV3uRXSpyzsKtwLg84X9fTZ1pSdCS8Vvqt7c\n\n\
+            ⚠️  Warning: Revocation is permanent!"
+        }
+        Screen::ListLicenses => {
+            "List Licenses - Keyboard Shortcuts\n\n\
+            Type      Enter data\n\
+            Enter     Fetch license\n\
+            ESC       Return to main menu\n\
+            F1 or ?   Toggle this help\n\n\
+            Format:\n\
+            owner_pubkey\n\n\
+            Example:\n\
+            3whY1ohdAV3uRXSpyzsKtwLg84X9fTZ1pSdCS8Vvqt7c"
+        }
+    };
+
+    let area = centered_rect(60, 70, f.area());
+    
+    f.render_widget(ratatui::widgets::Clear, area);
+    
+    let popup = Paragraph::new(help_text)
+        .style(Style::default().fg(t.fg).bg(t.bg))
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(t.accent))
+                .title("❓ Help - Press F1 or ? to close")
+                .title_style(Style::default().fg(t.title).add_modifier(Modifier::BOLD)),
+        )
+        .wrap(ratatui::widgets::Wrap { trim: true });
+    
+    f.render_widget(popup, area);
+}
+
+fn centered_rect(percent_x: u16, percent_y: u16, r: ratatui::layout::Rect) -> ratatui::layout::Rect {
+    let popup_layout = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Percentage((100 - percent_y) / 2),
+            Constraint::Percentage(percent_y),
+            Constraint::Percentage((100 - percent_y) / 2),
+        ])
+        .split(r);
+
+    Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Percentage((100 - percent_x) / 2),
+            Constraint::Percentage(percent_x),
+            Constraint::Percentage((100 - percent_x) / 2),
+        ])
+        .split(popup_layout[1])[1]
 }
