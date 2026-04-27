@@ -70,27 +70,7 @@ impl App {
     fn handle_key(&mut self, key: KeyEvent) -> bool {
         match self.screen {
             Screen::Main => match key.code {
-                KeyCode::Char('1') => {
-                    self.screen = Screen::IssueLicense;
-                    self.status_message = "Issue License - Enter: owner_pubkey,product_id,days".to_string();
-                }
-                KeyCode::Char('2') => {
-                    self.screen = Screen::ExtendLicense;
-                    self.status_message = "Extend License - Enter: owner_pubkey,additional_days".to_string();
-                }
-                KeyCode::Char('3') => {
-                    self.screen = Screen::ValidateLicense;
-                    self.status_message = "Validate License - Enter: owner_pubkey,product_id".to_string();
-                }
-                KeyCode::Char('4') => {
-                    self.screen = Screen::RevokeLicense;
-                    self.status_message = "Revoke License - Enter: owner_pubkey".to_string();
-                }
-                KeyCode::Char('5') => {
-                    self.screen = Screen::ListLicenses;
-                    self.status_message = "List Licenses - Enter: owner_pubkey".to_string();
-                }
-                KeyCode::Char('6') | KeyCode::Char('q') => return true,
+                KeyCode::Char('q') => return true,
                 KeyCode::Enter => {
                     match self.selected {
                         0 => {
