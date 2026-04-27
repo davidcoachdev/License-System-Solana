@@ -74,34 +74,81 @@ impl App {
                 ];
             }
             Screen::ExtendLicense => {
-                self.form_fields = vec![
-                    FormField::new("Owner Pubkey", "Pubkey of license owner", true),
-                    FormField::select("Additional Days", vec![
-                        "15 days".to_string(),
-                        "30 days".to_string(),
-                        "60 days".to_string(),
-                        "90 days".to_string(),
-                    ], true),
-                ];
+                let licenses = self.get_existing_licenses();
+                if licenses.is_empty() {
+                    self.form_fields = vec![
+                        FormField::readonly("No Licenses", "No licenses found. Create one first."),
+                    ];
+                } else {
+                    self.form_fields = vec![
+                        FormField::select("Select License", licenses, true),
+                        FormField::select("Additional Days", vec![
+                            "15 days".to_string(),
+                            "30 days".to_string(),
+                            "60 days".to_string(),
+                            "90 days".to_string(),
+                        ], true),
+                    ];
+                }
             }
             Screen::ValidateLicense => {
-                use crate::app::LicensePlan;
-                self.form_fields = vec![
-                    FormField::new("Owner Pubkey", "Pubkey of license owner", true),
-                    FormField::select("Product Plan", LicensePlan::get_names(), true),
-                ];
+                let licenses = self.get_existing_licenses();
+                if licenses.is_empty() {
+                    self.form_fields = vec![
+                        FormField::readonly("No Licenses", "No licenses found. Create one first."),
+                    ];
+                } else {
+                    use crate::app::LicensePlan;
+                    self.form_fields = vec![
+                        FormField::select("Select License", licenses, true),
+                        FormField::select("Product Plan", LicensePlan::get_names(), true),
+                    ];
+                }
             }
             Screen::RevokeLicense => {
-                self.form_fields = vec![
-                    FormField::new("Owner Pubkey", "Pubkey of license owner", true),
-                ];
+                let licenses = self.get_existing_licenses();
+                if licenses.is_empty() {
+                    self.form_fields = vec![
+                        FormField::readonly("No Licenses", "No licenses found. Create one first."),
+                    ];
+                } else {
+                    self.form_fields = vec![
+                        FormField::select("Select License", licenses, true),
+                    ];
+                }
             }
             Screen::ListLicenses => {
-                self.form_fields = vec![
-                    FormField::new("Owner Pubkey", "Pubkey of license owner", true),
-                ];
+                let licenses = self.get_existing_licenses();
+                if licenses.is_empty() {
+                    self.form_fields = vec![
+                        FormField::readonly("No Licenses", "No licenses found. Create one first."),
+                    ];
+                } else {
+                    self.form_fields = vec![
+                        FormField::select("Select License", licenses, true),
+                    ];
+                }
             }
             _ => {}
+        }
+    }
+
+    fn get_existing_licenses(&self) -> Vec<String> {
+        if let Some(client) = &self.sdk_client {
+            match client.get_all_licenses() {
+                Ok(licenses) => {
+                    licenses.iter().map(|l| {
+                        let short_owner = format!("{}...{}", 
+                            &l.owner.to_string()[..6], 
+                            &l.owner.to_string()[l.owner.to_string().len()-4..]
+                        );
+                        format!("{} - {}", short_owner, l.product_id)
+                    }).collect()
+                }
+                Err(_) => Vec::new(),
+            }
+        } else {
+            Vec::new()
         }
     }
 
