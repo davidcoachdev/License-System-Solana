@@ -36,16 +36,19 @@ pub struct App {
 
 impl App {
     pub fn new() -> Self {
+        let config = crate::app::Config::load();
+        let theme = Theme::by_name(&config.theme);
+        
         Self {
             screen: Screen::Main,
             selected: 0,
             input: String::new(),
             status_message: String::from("Welcome to License System TUI"),
             sdk_client: None,
-            theme: Theme::default(),
+            theme,
             form_fields: Vec::new(),
             form_index: 0,
-            network: "localnet".to_string(),
+            network: config.network,
             settings_items: vec![
                 "Theme".to_string(),
                 "Network".to_string(),
@@ -141,7 +144,7 @@ impl App {
         self.license_cache.clear();
         
         if let Some(client) = &self.sdk_client {
-            match client.get_all_licenses() {
+            match client.get_all_licenses_with_limit(Some(20)) {
                 Ok(licenses) => {
                     licenses.iter().map(|l| {
                         let owner_str = l.owner.to_string();
@@ -208,9 +211,29 @@ impl App {
         let keypair = solana_sdk::signature::read_keypair_file(keypair_path)
             .map_err(|e| anyhow::anyhow!("Failed to load keypair: {}", e))?;
         
-        let client = LicenseClient::new_localnet(keypair);
+        let rpc_url = match self.network.as_str() {
+            "devnet" => "https://api.devnet.solana.com",
+            "mainnet" => "https://api.mainnet-beta.solana.com",
+            _ => "http://127.0.0.1:8899",
+        };
+        
+        let client = LicenseClient::new(rpc_url, keypair);
         self.sdk_client = Some(client);
-        self.status_message = "Connected to Solana localnet".to_string();
+        self.status_message = format!("Connected to Solana {}", self.network);
         Ok(())
+    }
+
+    pub fn save_config(&self) {
+        let config = crate::app::Config {
+            theme: self.theme.name.clone(),
+            network: self.network.clone(),
+        };
+        let _ = config.save();
+    }
+
+    pub fn format_timestamp(ts: i64) -> String {
+        use chrono::{DateTime, Utc};
+        let dt = DateTime::<Utc>::from_timestamp(ts, 0).unwrap_or_default();
+        dt.format("%Y-%m-%d %H:%M:%S UTC").to_string()
     }
 }

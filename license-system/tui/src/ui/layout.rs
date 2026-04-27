@@ -419,12 +419,12 @@ fn render_all_licenses_table(f: &mut Frame, app: &App, area: Rect) {
     let t = &app.theme;
     
     let licenses_text = if let Some(client) = &app.sdk_client {
-        match client.get_all_licenses() {
+        match client.get_all_licenses_with_limit(Some(20)) {
             Ok(licenses) => {
                 if licenses.is_empty() {
                     "No licenses found.\n\nCreate a license first.".to_string()
                 } else {
-                    let mut text = format!("Total Licenses: {}\n\n", licenses.len());
+                    let mut text = format!("Total Licenses: {} (showing first 20)\n\n", licenses.len());
                     for (i, license) in licenses.iter().enumerate() {
                         let status = if license.is_revoked {
                             "❌ Revoked"
@@ -437,7 +437,7 @@ fn render_all_licenses_table(f: &mut Frame, app: &App, area: Rect) {
                             &license.owner.to_string()[..6],
                             &license.owner.to_string()[license.owner.to_string().len()-4..],
                             license.product_id,
-                            license.expires_at,
+                            crate::app::App::format_timestamp(license.expires_at),
                             status
                         ));
                     }
@@ -481,7 +481,7 @@ fn render_revoked_history(f: &mut Frame, app: &App, area: Rect) {
                 &revoked.owner[..6],
                 &revoked.owner[revoked.owner.len()-4..],
                 revoked.product_id,
-                revoked.revoked_at,
+                crate::app::App::format_timestamp(revoked.revoked_at),
                 &revoked.revoke_signature[..20]
             ));
         }
