@@ -74,6 +74,7 @@ impl App {
                     return false;
                 }
                 ModalType::Progress { .. } => {
+                    self.modal = None;
                     return false;
                 }
             }
