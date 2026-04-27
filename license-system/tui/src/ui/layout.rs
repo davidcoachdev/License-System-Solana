@@ -45,12 +45,19 @@ pub fn render(f: &mut Frame, app: &App) {
 fn render_menu(f: &mut Frame, app: &App, area: ratatui::layout::Rect) {
     let t = &app.theme;
     
+    let menu_title = match app.screen {
+        Screen::Settings => "Settings",
+        Screen::SettingsTheme => "Theme",
+        Screen::SettingsNetwork => "Network",
+        _ => "Menu",
+    };
+    
     let items: Vec<ListItem> = app
         .menu_items()
         .iter()
         .enumerate()
         .map(|(i, item)| {
-            let style = if i == app.selected && matches!(app.screen, Screen::Main) {
+            let style = if i == app.selected {
                 Style::default()
                     .fg(t.accent)
                     .bg(t.highlight)
@@ -58,7 +65,7 @@ fn render_menu(f: &mut Frame, app: &App, area: ratatui::layout::Rect) {
             } else {
                 Style::default().fg(t.fg).bg(t.bg)
             };
-            let prefix = if i == app.selected && matches!(app.screen, Screen::Main) { "▸ " } else { "  " };
+            let prefix = if i == app.selected { "▸ " } else { "  " };
             ListItem::new(Line::from(Span::styled(format!("{}{}", prefix, item), style)))
         })
         .collect();
@@ -67,7 +74,7 @@ fn render_menu(f: &mut Frame, app: &App, area: ratatui::layout::Rect) {
         Block::default()
             .borders(Borders::ALL)
             .border_style(Style::default().fg(t.border))
-            .title("Menu")
+            .title(menu_title)
             .title_style(Style::default().fg(t.title).add_modifier(Modifier::BOLD)),
     );
     f.render_widget(list, area);
@@ -95,95 +102,35 @@ fn render_content(f: &mut Frame, app: &App, area: ratatui::layout::Rect) {
             );
             f.render_widget(help, area);
         }
-        Screen::Settings => {
-            let settings_items: Vec<ListItem> = app
-                .settings_items
-                .iter()
-                .enumerate()
-                .map(|(i, item)| {
-                    let style = if i == app.selected {
-                        Style::default()
-                            .fg(t.accent)
-                            .add_modifier(Modifier::BOLD)
-                    } else {
-                        Style::default().fg(t.fg)
-                    };
-                    let prefix = if i == app.selected { "▸ " } else { "  " };
-                    ListItem::new(Line::from(Span::styled(format!("{}{}", prefix, item), style)))
-                })
-                .collect();
-
-            let settings_list = List::new(settings_items).block(
-                Block::default()
-                    .borders(Borders::ALL)
-                    .border_style(Style::default().fg(t.border))
-                    .title("Settings")
-                    .title_style(Style::default().fg(t.title).add_modifier(Modifier::BOLD)),
-            );
-            f.render_widget(settings_list, area);
-        }
-        Screen::SettingsTheme => {
-            let theme_items: Vec<ListItem> = Theme::names()
-                .iter()
-                .enumerate()
-                .map(|(i, name)| {
-                    let is_current = name == &app.theme.name;
-                    let style = if i == app.selected {
-                        Style::default()
-                            .fg(t.accent)
-                            .add_modifier(Modifier::BOLD)
-                    } else {
-                        Style::default().fg(t.fg)
-                    };
-                    let marker = if is_current { "●" } else { "○" };
-                    let prefix = if i == app.selected { "▸ " } else { "  " };
-                    ListItem::new(Line::from(Span::styled(
-                        format!("{}{} {}", prefix, marker, name),
-                        style,
-                    )))
-                })
-                .collect();
-
-            let theme_list = List::new(theme_items).block(
-                Block::default()
-                    .borders(Borders::ALL)
-                    .border_style(Style::default().fg(t.border))
-                    .title("Select Theme")
-                    .title_style(Style::default().fg(t.title).add_modifier(Modifier::BOLD)),
-            );
-            f.render_widget(theme_list, area);
-        }
-        Screen::SettingsNetwork => {
-            let networks = vec!["localnet", "devnet", "mainnet"];
-            let network_items: Vec<ListItem> = networks
-                .iter()
-                .enumerate()
-                .map(|(i, name)| {
-                    let is_current = name == &app.network.as_str();
-                    let style = if i == app.selected {
-                        Style::default()
-                            .fg(t.accent)
-                            .add_modifier(Modifier::BOLD)
-                    } else {
-                        Style::default().fg(t.fg)
-                    };
-                    let marker = if is_current { "●" } else { "○" };
-                    let prefix = if i == app.selected { "▸ " } else { "  " };
-                    ListItem::new(Line::from(Span::styled(
-                        format!("{}{} {}", prefix, marker, name),
-                        style,
-                    )))
-                })
-                .collect();
-
-            let network_list = List::new(network_items).block(
-                Block::default()
-                    .borders(Borders::ALL)
-                    .border_style(Style::default().fg(t.border))
-                    .title("Select Network")
-                    .title_style(Style::default().fg(t.title).add_modifier(Modifier::BOLD)),
-            );
-            f.render_widget(network_list, area);
+        Screen::Settings | Screen::SettingsTheme | Screen::SettingsNetwork => {
+            let help_text = match app.screen {
+                Screen::Settings => "Select an option from the menu\n\n\
+                    Theme: Change color scheme\n\
+                    Network: Switch between localnet/devnet/mainnet\n\
+                    Back: Return to main menu",
+                Screen::SettingsTheme => "Select a theme from the menu\n\n\
+                    Dark: Dark blue theme (default)\n\
+                    Light: Light theme\n\
+                    Dracula: Dracula theme\n\
+                    Nord: Nord theme\n\
+                    Gruvbox: Gruvbox theme",
+                Screen::SettingsNetwork => "Select a network from the menu\n\n\
+                    Localnet: http://127.0.0.1:8899\n\
+                    Devnet: https://api.devnet.solana.com\n\
+                    Mainnet: https://api.mainnet-beta.solana.com",
+                _ => "",
+            };
+            
+            let help = Paragraph::new(help_text)
+                .style(Style::default().fg(t.muted).bg(t.bg))
+                .block(
+                    Block::default()
+                        .borders(Borders::ALL)
+                        .border_style(Style::default().fg(t.border))
+                        .title("Info")
+                        .title_style(Style::default().fg(t.title).add_modifier(Modifier::BOLD)),
+                );
+            f.render_widget(help, area);
         }
         _ => {
             let input_block = Paragraph::new(app.input.as_str())
