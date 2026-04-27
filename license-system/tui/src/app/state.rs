@@ -58,22 +58,35 @@ impl App {
         
         match self.screen {
             Screen::IssueLicense => {
+                use crate::app::LicensePlan;
                 self.form_fields = vec![
                     FormField::new("Owner Pubkey", "Pubkey of license owner", true),
-                    FormField::new("Product ID", "e.g. premium-plan", true),
-                    FormField::new("Duration (days)", "e.g. 30", true),
+                    FormField::select("Product Plan", LicensePlan::get_names(), true),
+                    FormField::select("Duration", vec![
+                        "30 days".to_string(),
+                        "60 days".to_string(),
+                        "90 days".to_string(),
+                        "180 days".to_string(),
+                        "365 days".to_string(),
+                    ], true),
                 ];
             }
             Screen::ExtendLicense => {
                 self.form_fields = vec![
                     FormField::new("Owner Pubkey", "Pubkey of license owner", true),
-                    FormField::new("Additional Days", "e.g. 15", true),
+                    FormField::select("Additional Days", vec![
+                        "15 days".to_string(),
+                        "30 days".to_string(),
+                        "60 days".to_string(),
+                        "90 days".to_string(),
+                    ], true),
                 ];
             }
             Screen::ValidateLicense => {
+                use crate::app::LicensePlan;
                 self.form_fields = vec![
                     FormField::new("Owner Pubkey", "Pubkey of license owner", true),
-                    FormField::new("Product ID", "e.g. premium-plan", true),
+                    FormField::select("Product Plan", LicensePlan::get_names(), true),
                 ];
             }
             Screen::RevokeLicense => {

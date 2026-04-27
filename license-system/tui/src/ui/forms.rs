@@ -29,7 +29,14 @@ pub fn render_form(f: &mut Frame, app: &App, area: Rect) {
         )));
         
         let bar = if is_active { "┃" } else { "│" };
-        let value_text = if field.value.is_empty() {
+        
+        let value_text = if !field.options.is_empty() {
+            if is_active {
+                format!("{}  ◀ {} ▶", bar, field.value)
+            } else {
+                format!("{}  {}", bar, field.value)
+            }
+        } else if field.value.is_empty() {
             if is_active {
                 format!("{}  | {}", bar, field.placeholder)
             } else {
@@ -55,7 +62,7 @@ pub fn render_form(f: &mut Frame, app: &App, area: Rect) {
     
     lines.push(Line::from(""));
     lines.push(Line::from(Span::styled(
-        "  ↑↓ Navigate fields  |  Enter Submit  |  ESC Cancel",
+        "  ↑↓ Navigate fields  |  ←→ Change option  |  Enter Submit  |  ESC Cancel",
         Style::default().fg(t.muted),
     )));
     

@@ -235,14 +235,30 @@ impl App {
                     self.form_index += 1;
                 }
             }
+            KeyCode::Left => {
+                if self.form_index < self.form_fields.len() {
+                    self.form_fields[self.form_index].cycle_prev();
+                }
+            }
+            KeyCode::Right => {
+                if self.form_index < self.form_fields.len() {
+                    self.form_fields[self.form_index].cycle_next();
+                }
+            }
             KeyCode::Char(c) => {
                 if self.form_index < self.form_fields.len() {
-                    self.form_fields[self.form_index].value.push(c);
+                    let field = &self.form_fields[self.form_index];
+                    if field.options.is_empty() {
+                        self.form_fields[self.form_index].value.push(c);
+                    }
                 }
             }
             KeyCode::Backspace => {
                 if self.form_index < self.form_fields.len() {
-                    self.form_fields[self.form_index].value.pop();
+                    let field = &self.form_fields[self.form_index];
+                    if field.options.is_empty() {
+                        self.form_fields[self.form_index].value.pop();
+                    }
                 }
             }
             KeyCode::Enter => {
@@ -276,8 +292,8 @@ impl App {
                 }
                 
                 let owner_str = &self.form_fields[0].value;
-                let product_id = &self.form_fields[1].value;
-                let days_str = &self.form_fields[2].value;
+                let plan_name = &self.form_fields[1].value;
+                let duration_str = &self.form_fields[2].value;
                 
                 let owner = match Pubkey::from_str(owner_str.trim()) {
                     Ok(pk) => pk,
@@ -287,17 +303,24 @@ impl App {
                     }
                 };
                 
-                let days: i64 = match days_str.trim().parse() {
-                    Ok(d) => d,
-                    Err(_) => {
-                        self.status_message = "❌ Invalid days number".to_string();
+                use crate::app::LicensePlan;
+                let product_id = match LicensePlan::find_by_name(plan_name) {
+                    Some(plan) => plan.id,
+                    None => {
+                        self.status_message = "❌ Invalid plan selected".to_string();
                         return;
                     }
                 };
+                
+                let days: i64 = duration_str
+                    .split_whitespace()
+                    .next()
+                    .and_then(|s| s.parse().ok())
+                    .unwrap_or(30);
 
                 self.status_message = "Issuing license...".to_string();
                 
-                match client.op_issue_license(&owner.to_string(), product_id, days) {
+                match client.op_issue_license(&owner.to_string(), &product_id, days) {
                     Ok(sig) => {
                         self.status_message = format!("✅ License issued!\nSignature: {}", sig);
                         self.form_fields.clear();
@@ -314,7 +337,7 @@ impl App {
                 }
                 
                 let owner_str = &self.form_fields[0].value;
-                let days_str = &self.form_fields[1].value;
+                let duration_str = &self.form_fields[1].value;
                 
                 let owner = match Pubkey::from_str(owner_str.trim()) {
                     Ok(pk) => pk,
@@ -324,13 +347,11 @@ impl App {
                     }
                 };
                 
-                let days: i64 = match days_str.trim().parse() {
-                    Ok(d) => d,
-                    Err(_) => {
-                        self.status_message = "❌ Invalid days number".to_string();
-                        return;
-                    }
-                };
+                let days: i64 = duration_str
+                    .split_whitespace()
+                    .next()
+                    .and_then(|s| s.parse().ok())
+                    .unwrap_or(15);
 
                 self.status_message = "Extending license...".to_string();
                 
@@ -351,12 +372,21 @@ impl App {
                 }
                 
                 let owner_str = &self.form_fields[0].value;
-                let product_id = &self.form_fields[1].value;
+                let plan_name = &self.form_fields[1].value;
                 
                 let owner = match Pubkey::from_str(owner_str.trim()) {
                     Ok(pk) => pk,
                     Err(_) => {
                         self.status_message = "❌ Invalid owner pubkey".to_string();
+                        return;
+                    }
+                };
+                
+                use crate::app::LicensePlan;
+                let product_id = match LicensePlan::find_by_name(plan_name) {
+                    Some(plan) => plan.id,
+                    None => {
+                        self.status_message = "❌ Invalid plan selected".to_string();
                         return;
                     }
                 };
