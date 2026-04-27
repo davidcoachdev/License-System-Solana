@@ -38,6 +38,14 @@ impl LicenseClient {
         self.payer.pubkey()
     }
 
+    pub fn derive_license_pda(&self, owner: &Pubkey) -> (Pubkey, u8) {
+        derive_license_pda(owner)
+    }
+
+    pub fn program_id(&self) -> Pubkey {
+        program_id().unwrap()
+    }
+
     fn disc(name: &str) -> Vec<u8> {
         hash(format!("global:{}", name).as_bytes()).to_bytes()[..8].to_vec()
     }

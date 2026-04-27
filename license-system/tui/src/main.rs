@@ -50,7 +50,7 @@ impl App {
         let keypair = solana_sdk::signature::read_keypair_file(keypair_path)
             .map_err(|e| anyhow::anyhow!("Failed to load keypair: {}", e))?;
         
-        let client = LicenseClient::new_localnet(keypair)?;
+        let client = LicenseClient::new_localnet(keypair);
         self.sdk_client = Some(client);
         self.status_message = "Connected to Solana localnet".to_string();
         Ok(())
@@ -157,11 +157,16 @@ impl App {
                     }
                 };
 
-                let (license_pda, bump) = client.derive_license_pda(&owner);
-                self.status_message = format!(
-                    "✅ Ready to issue license!\nPDA: {}\nBump: {}\nOwner: {}\nProduct: {}\nDays: {}\nPayer: {}\n\n[Demo mode - use TypeScript tests for real transactions]",
-                    license_pda, bump, owner, product_id, days, client.payer_pubkey()
-                );
+                self.status_message = "Issuing license...".to_string();
+                
+                match client.op_issue_license(&owner.to_string(), &product_id, days) {
+                    Ok(sig) => {
+                        self.status_message = format!("✅ License issued!\nSignature: {}", sig);
+                    }
+                    Err(e) => {
+                        self.status_message = format!("❌ Error: {}", e);
+                    }
+                }
             }
             Screen::ExtendLicense => {
                 let parts: Vec<&str> = self.input.split(',').collect();
@@ -186,11 +191,16 @@ impl App {
                     }
                 };
 
-                let (license_pda, bump) = client.derive_license_pda(&owner);
-                self.status_message = format!(
-                    "✅ Ready to extend license!\nPDA: {}\nBump: {}\nAdditional days: {}\n\n[Demo mode - use TypeScript tests for real transactions]",
-                    license_pda, bump, days
-                );
+                self.status_message = "Extending license...".to_string();
+                
+                match client.op_extend_license(&owner.to_string(), days) {
+                    Ok(sig) => {
+                        self.status_message = format!("✅ License extended!\nSignature: {}", sig);
+                    }
+                    Err(e) => {
+                        self.status_message = format!("❌ Error: {}", e);
+                    }
+                }
             }
             Screen::ValidateLicense => {
                 let parts: Vec<&str> = self.input.split(',').collect();
@@ -223,11 +233,16 @@ impl App {
                     }
                 };
 
-                let (license_pda, bump) = client.derive_license_pda(&owner);
-                self.status_message = format!(
-                    "✅ Ready to revoke license!\nPDA: {}\nBump: {}\n\n[Demo mode - use TypeScript tests for real transactions]",
-                    license_pda, bump
-                );
+                self.status_message = "Revoking license...".to_string();
+                
+                match client.op_revoke_license(&owner.to_string()) {
+                    Ok(sig) => {
+                        self.status_message = format!("✅ License revoked!\nSignature: {}", sig);
+                    }
+                    Err(e) => {
+                        self.status_message = format!("❌ Error: {}", e);
+                    }
+                }
             }
             Screen::ListLicenses => {
                 let owner = match Pubkey::from_str(self.input.trim()) {
@@ -238,11 +253,21 @@ impl App {
                     }
                 };
                 
-                let (license_pda, bump) = client.derive_license_pda(&owner);
-                self.status_message = format!(
-                    "📋 License Info:\nPDA: {}\nBump: {}\nOwner: {}\nPayer: {}\nProgram ID: {}\n\n[Demo mode - showing PDA derivation only]",
-                    license_pda, bump, owner, client.payer_pubkey(), client.program_id()
-                );
+                self.status_message = "Fetching license...".to_string();
+                
+                match client.get_license(&owner.to_string()) {
+                    Ok(license) => {
+                        use license_sdk::pda::derive_license_pda;
+                        let (pda, bump) = derive_license_pda(&owner);
+                        self.status_message = format!(
+                            "✅ License Found!\nPDA: {}\nBump: {}\nOwner: {}\nProduct: {}\nExpires: {}\nRevoked: {}",
+                            pda, bump, license.owner, license.product_id, license.expires_at, license.is_revoked
+                        );
+                    }
+                    Err(e) => {
+                        self.status_message = format!("❌ Error: {}", e);
+                    }
+                }
             }
             Screen::Main => {
                 return;
