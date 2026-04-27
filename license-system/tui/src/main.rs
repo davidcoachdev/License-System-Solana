@@ -58,12 +58,12 @@ impl App {
 
     fn menu_items(&self) -> Vec<&str> {
         vec![
-            "1. Issue License",
-            "2. Extend License",
-            "3. Validate License",
-            "4. Revoke License",
-            "5. List Licenses",
-            "6. Exit",
+            "Issue License",
+            "Extend License",
+            "Validate License",
+            "Revoke License",
+            "List Licenses",
+            "Exit",
         ]
     }
 
@@ -305,7 +305,7 @@ impl App {
 }
 
 fn ui(f: &mut Frame, app: &App) {
-    let chunks = Layout::default()
+    let main_chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
             Constraint::Length(3),
@@ -317,32 +317,55 @@ fn ui(f: &mut Frame, app: &App) {
     let title = Paragraph::new("License System on Solana - TUI")
         .style(Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD))
         .block(Block::default().borders(Borders::ALL));
-    f.render_widget(title, chunks[0]);
+    f.render_widget(title, main_chunks[0]);
+
+    let content_chunks = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Percentage(30),
+            Constraint::Percentage(70),
+        ])
+        .split(main_chunks[1]);
+
+    let items: Vec<ListItem> = app
+        .menu_items()
+        .iter()
+        .enumerate()
+        .map(|(i, item)| {
+            let style = if i == app.selected {
+                Style::default()
+                    .fg(Color::Yellow)
+                    .add_modifier(Modifier::BOLD)
+            } else {
+                Style::default()
+            };
+            ListItem::new(Line::from(Span::styled(*item, style)))
+        })
+        .collect();
+
+    let list = List::new(items).block(
+        Block::default()
+            .borders(Borders::ALL)
+            .title("Menu - Use ↑↓ Enter"),
+    );
+    f.render_widget(list, content_chunks[0]);
 
     match app.screen {
         Screen::Main => {
-            let items: Vec<ListItem> = app
-                .menu_items()
-                .iter()
-                .enumerate()
-                .map(|(i, item)| {
-                    let style = if i == app.selected {
-                        Style::default()
-                            .fg(Color::Yellow)
-                            .add_modifier(Modifier::BOLD)
-                    } else {
-                        Style::default()
-                    };
-                    ListItem::new(Line::from(Span::styled(*item, style)))
-                })
-                .collect();
-
-            let list = List::new(items).block(
+            let help = Paragraph::new(
+                "Welcome to License System TUI\n\n\
+                Navigate with ↑↓ arrows\n\
+                Press Enter to select\n\
+                Press ESC to return\n\
+                Press q to quit"
+            )
+            .style(Style::default().fg(Color::Gray))
+            .block(
                 Block::default()
                     .borders(Borders::ALL)
-                    .title("Main Menu - Use ↑↓ or numbers to select"),
+                    .title("Help"),
             );
-            f.render_widget(list, chunks[1]);
+            f.render_widget(help, content_chunks[1]);
         }
         _ => {
             let input_block = Paragraph::new(app.input.as_str())
@@ -352,14 +375,14 @@ fn ui(f: &mut Frame, app: &App) {
                         .borders(Borders::ALL)
                         .title(format!("{:?} - Press ESC to return", app.screen)),
                 );
-            f.render_widget(input_block, chunks[1]);
+            f.render_widget(input_block, content_chunks[1]);
         }
     }
 
     let status = Paragraph::new(app.status_message.as_str())
         .style(Style::default().fg(Color::Green))
         .block(Block::default().borders(Borders::ALL).title("Status"));
-    f.render_widget(status, chunks[2]);
+    f.render_widget(status, main_chunks[2]);
 }
 
 fn main() -> Result<()> {
