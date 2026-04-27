@@ -3,9 +3,28 @@ use solana_sdk::pubkey::Pubkey;
 use std::str::FromStr;
 
 use crate::app::{App, Screen, Theme};
+use crate::ui::ConfirmModal;
 
 impl App {
     pub fn handle_key(&mut self, key: KeyEvent) -> bool {
+        if let Some(modal) = &mut self.confirm_modal {
+            match key.code {
+                KeyCode::Left | KeyCode::Right | KeyCode::Char('h') | KeyCode::Char('l') => {
+                    modal.toggle_selection();
+                }
+                KeyCode::Enter => {
+                    let should_quit = modal.is_confirm_selected();
+                    self.confirm_modal = None;
+                    return should_quit;
+                }
+                KeyCode::Esc | KeyCode::Char('n') => {
+                    self.confirm_modal = None;
+                }
+                _ => {}
+            }
+            return false;
+        }
+
         if key.code == KeyCode::F(1) || key.code == KeyCode::Char('?') {
             self.show_help_popup = !self.show_help_popup;
             return false;
@@ -27,7 +46,13 @@ impl App {
 
     fn handle_main_menu(&mut self, key: KeyEvent) -> bool {
         match key.code {
-            KeyCode::Char('q') => return true,
+            KeyCode::Char('q') => {
+                self.confirm_modal = Some(ConfirmModal::new(
+                    "⚠️  Confirm Exit",
+                    "Are you sure you want to exit?\n\nUse ←→ to select, Enter to confirm"
+                ));
+                return false;
+            }
             KeyCode::Enter => {
                 match self.selected {
                     0 => {
@@ -55,7 +80,12 @@ impl App {
                         self.status_message = "Settings - Select an option".to_string();
                         self.selected = 0;
                     }
-                    6 => return true,
+                    6 => {
+                        self.confirm_modal = Some(ConfirmModal::new(
+                            "⚠️  Confirm Exit",
+                            "Are you sure you want to exit?\n\nUse ←→ to select, Enter to confirm"
+                        ));
+                    }
                     _ => {}
                 }
             }

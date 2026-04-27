@@ -44,6 +44,10 @@ pub fn render(f: &mut Frame, app: &App) {
     if app.show_help_popup {
         render_help_popup(f, app);
     }
+
+    if let Some(modal) = &app.confirm_modal {
+        modal.render(f, &app.theme);
+    }
 }
 
 fn render_menu(f: &mut Frame, app: &App, area: ratatui::layout::Rect) {
